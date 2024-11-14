@@ -1,0 +1,31 @@
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+<script>
+    let menuList = document.getElementById("menuList")
+    menuList.style.maxHeight = "0px";
+
+    function toggleMenu(){
+        if(menuList.style.maxHeight == "0px")
+        {
+            menuList.style.maxHeight = "300px";
+        }
+        else{
+            menuList.style.maxHeight = "0px";
+        }
+    }
+    
+</script>
+<script src="https://kit.fontawesome.com/f8e1a90484.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+</body>
+</html>

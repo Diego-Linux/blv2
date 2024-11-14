@@ -1,0 +1,2110 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+
+:root {
+    --main-red: #D13239;
+    --main-green: #198754;
+    --main-bg: #262626;
+    --bg-header: #262626;
+    --main-white: #FFFFFF;
+    --err-toastify: var(--main-red);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    /* font-family: 'Rubik', Arial, Helvetica, sans-serif; */
+}
+
+/* Estilos gerais do painel de controle */
+.font-control {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px); /* Inicia discretamente acima */
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    position: fixed;
+    top: 140px; /* Fica abaixo da engrenagem */
+    border:1px solid rgba(255, 255, 255, 0.479);
+    left: 4px; /* Alinha o painel à esquerda da tela */
+    background-color: #0c0b0b; /* Fundo vermelho transparente */
+    border-radius: 6px; /* Bordas mais suaves */
+    padding: 10px;
+    z-index: 1000;
+    width: 70px; /* Painel mais estreito */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+/* Ícones dentro do painel */
+.font-control i {
+    color: #fff; /* Cor branca para ícones */
+    font-size: 20px; /* Ícones menores */
+    margin-right: 5px; /* Menor espaçamento entre ícones e texto */
+}
+
+/* Quando a classe 'active' for adicionada, mostra o painel */
+.font-control.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0); /* Desliza suavemente para baixo */
+}
+
+/* Estilo do botão de controle (engrenagem) */
+.control-toggle {
+    position: fixed;
+    top: 100px; /* Distância da parte superior da tela */
+    left: 4px; /* Distância da borda esquerda */
+    background: var(--main-green); /* Fundo branco */
+    color: var(--main-white); /* Cor escura */
+    border: none; /* Borda escura */
+    border-radius: 50%;
+    padding: 5px; /* Tamanho do botão */
+    font-size: 18px; /* Tamanho da engrenagem */
+    cursor: pointer;
+    z-index: 1001;
+    transition: background-color 0.3s, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efeito de hover para o botão de controle */
+.control-toggle:hover {
+    transform: scale(1.05); /* Levemente maior no hover */
+}
+
+/* Estilo dos botões dentro do painel */
+.font-control button {
+    background: var(--main-green); /* Vermelho mais sutil */
+    border: none;
+    color: white; /* Texto branco */
+    font-size: 14px; /* Fonte pequena para os botões */
+    cursor: pointer;
+    padding: 8px 12px; /* Botões pequenos */
+    margin: 5px 0;
+    border-radius: 4px; /* Bordas arredondadas mais suaves */
+    transition: background-color 0.3s, transform 0.2s ease;
+    width: 100%; /* Botões ocupam toda a largura */
+}
+
+/* Efeito de hover para os botões */
+.font-control button:hover {
+    transform: translateY(-2px); /* Levanta suavemente */
+}
+
+/* Responsividade para botões e painel */
+@media (max-width: 768px) {
+    .font-control {
+        width: 90%; /* Painel ocupa 90% da largura em telas pequenas */
+        top: 60px; /* Distância menor da parte superior */
+    }
+
+    .font-control button {
+        font-size: 12px; /* Fonte ainda menor em telas pequenas */
+        padding: 6px 10px; /* Botões menores */
+    }
+
+    .control-toggle {
+        font-size: 24px; /* Ícone menor em telas pequenas */
+        padding: 8px; /* Tamanho do botão de engrenagem ajustado */
+    }
+
+    .font-control.active {
+        top: 50px; /* Ajusta a posição do painel */
+    }
+}
+
+
+/* Estilos do Header */
+nav {
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-header);
+    position: relative;
+    height: 60px;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    color: var(--main-white);
+    margin-left: 50px;
+}
+
+nav ul {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    padding-right: 60px;
+}
+
+nav ul li {
+    list-style-type: none;
+    position: relative;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--main-white);
+    cursor: pointer;
+    position: relative;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+nav ul li ul.submenu {
+    display: none;
+    top: 100%;
+    left: 0;
+    background: var(--bg-header);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    /* Sombra leve e brilhosa */
+    width: 180px;
+}
+
+nav ul li ul.submenu li {
+    padding: 10px;
+    width: 100%;
+}
+
+.menu-icon {
+    display: none;
+}
+
+.menu-icon i {
+    color: var(--main-red);
+    margin-top: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+nav ul ul {
+    display: none;
+    /* Submenu escondido por padrão */
+    position: absolute;
+    background-color: var(--bg-header);
+    padding: 10px;
+    list-style-type: none;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+nav ul li ul li {
+    padding: 10px 20px;
+    /* Padding interno */
+}
+
+nav ul li ul li a {
+    color: var(--main-white);
+}
+
+nav ul li ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Para dispositivos menores */
+@media (max-width: 950px) {
+    nav ul {
+        position: absolute;
+        top: 65px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: start;
+        padding-left: 20px;
+        background: var(--bg-header);
+        gap: 0;
+        overflow-y: auto;
+        max-height: 300px;
+        box-shadow: 0 2px 2px rgba(255, 255, 255, 0.2);
+        /* Sombra leve */
+        /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
+    }
+
+    nav ul ul {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    nav ul li ul li {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 950px) {
+    nav ul {
+        position: absolute;
+        top: 65px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: start;
+        padding-left: 60px;
+        background: var(--bg-header);
+        gap: 0;
+        overflow-y: auto;
+        max-height: 300px;
+        transition: max-height 0.3s ease;
+        /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); */
+    }
+
+    nav ul li {
+        padding: 20px;
+        padding-top: 5px;
+    }
+
+    nav ul li ul.submenu {
+        position: relative;
+        width: 100%;
+    }
+
+    .menu-icon {
+        display: block;
+    }
+
+    #menuList {
+        transition: all 0.7s;
+    }
+}
+
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    margin-right: 0px;
+    /* Ajuste conforme necessário */
+    margin-top: 10px;
+}
+
+.notification-icon i {
+    color: var(--main-white);
+    font-size: 24px;
+    position: relative;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.notification-icon ul.submenu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 120%;
+    background: var(--bg-header);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    width: 180px;
+    z-index: 1000;
+}
+
+.notification-icon ul.submenu li {
+    padding: 10px;
+    width: 100%;
+}
+
+.notification-icon ul.submenu li a {
+    color: var(--main-white);
+    text-decoration: none;
+}
+
+.notification-icon ul.submenu li a:hover {
+    text-decoration: underline;
+}
+
+/*Fim do Header*/
+
+/* Container da lista de trades */
+.card-mytrade-container {
+    background: var(--main-bg);
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card-mytrade-card {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+    /* Certifique-se de que o card ocupa 100% do espaço */
+    border: 1px solid #dddddd88;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    /* Evita que o conteúdo vaze do card */
+}
+
+/* Título da card */
+.card-mytrade-title {
+    color: var(--main-red);
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Conteúdo da card */
+.card-mytrade-card-content {
+    width: 70%;
+    /* Largura do conteúdo */
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+}
+
+/* Imagens */
+.card-mytrade-images {
+    display: flex;
+    gap: 10px;
+    /* Espaçamento entre as imagens */
+    margin-top: 30px;
+    padding: 0;
+    /* Padding para afastar do conteúdo */
+    width: 100%;
+    /* Use 100% para ocupar toda a largura do card */
+}
+
+.card-mytrade-images img {
+    width: 150px;
+    /* Aumente o tamanho fixo da imagem */
+    height: 190px;
+    /* Mantenha a altura fixa para as imagens */
+    object-fit: cover;
+    /* Preenche o espaço sem distorcer */
+    border-radius: 4px;
+    /* Bordas arredondadas */
+}
+
+/* Estilo do texto */
+.card-mytrade-card-content strong {
+    color: var(--main-red);
+}
+
+.card-mytrade-card-content p {
+    margin-left: 3px;
+    margin-top: 10px;
+    color: var(--main-white);
+}
+
+.card-mytrade-card-content a {
+    margin-left: 3px;
+    color: var(--main-white);
+    text-decoration: underline;
+}
+
+/* Ações dos botões */
+.card-mytrade-actions {
+    display: flex;
+    flex-wrap: wrap;
+    /* Permite que os botões "quebrem" para a linha abaixo */
+    margin-top: 20px;
+}
+
+/* Botões - verde para concluir, vermelho para cancelar */
+.card-mytrade-btn-confirm,
+.card-mytrade-btn-cancel {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.card-mytrade-btn-confirm {
+    background-color: var(--main-green);
+    color: white;
+}
+
+.card-mytrade-btn-cancel {
+    background-color: var(--main-red);
+    color: white;
+}
+
+/* Efeito hover para os botões */
+.card-mytrade-btn-confirm:hover {
+    background-color: #45a049;
+}
+
+.card-mytrade-btn-cancel:hover {
+    background-color: #e53935;
+}
+
+/* Estilo do modal trade */
+.card-mytrade-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.342)
+}
+
+.card-mytrade-modal-buttons {
+    display: flex;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.card-mytrade-modal-content {
+    background-color: var(--main-bg);
+    /* Cor de fundo do conteúdo do modal */
+    margin: 15% auto;
+    /* Centraliza o modal verticalmente e o posiciona a 15% da parte superior */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    /* Largura máxima do modal */
+}
+
+/* Fechar modal (X) */
+.card-mytrade-close-modal {
+    float: right;
+    /* Flutua à direita */
+    font-size: 28px;
+    /* Tamanho da fonte */
+    font-weight: bold;
+    /* Negrito */
+    cursor: pointer;
+    /* Cursor em forma de mão */
+    color: #aaa;
+    /* Cor padrão */
+}
+
+.card-mytrade-close-modal:hover,
+.card-mytrade-close-modal:focus {
+    color: var(--main-white);
+    /* Cor ao passar o mouse */
+}
+
+.card-mytrade-modal h2 {
+    margin-bottom: 20px;
+    /* Espaçamento abaixo do título */
+}
+
+/* Botões dentro do modal */
+.card-mytrade-modal-buttons {
+    display: flex;
+    /* Utiliza flexbox */
+    justify-content: center;
+    /* Centraliza os botões */
+    gap: 10px;
+    /* Espaçamento entre os botões */
+}
+
+.card-mytrade-modal-buttons .card-mytrade-btn-confirm,
+.card-mytrade-modal-buttons .card-mytrade-btn-cancel {
+    width: 200px;
+    /* Largura fixa dos botões */
+    padding: 8px;
+    /* Aumenta o espaçamento interno */
+    font-size: 16px;
+    /* Tamanho da fonte dos botões */
+    border-radius: 5px;
+    /* Arredondamento das bordas dos botões */
+    cursor: pointer;
+    /* Cursor em forma de mão */
+    border: none;
+    /* Sem borda */
+}
+
+/* Cor de fundo do botão de confirmação */
+.card-mytrade-modal-buttons .card-mytrade-btn-confirm {
+    background-color: var(--main-green);
+    /* Verde */
+    color: var(--main-white);
+    /* Texto branco */
+}
+
+/* Cor de fundo do botão de cancelamento */
+.card-mytrade-modal-buttons .card-mytrade-btn-cancel {
+    background-color: var(--main-red);
+    /* Vermelho */
+    color: var(--main-white);
+    /* Texto branco */
+}
+
+/* Efeito hover nos botões */
+.card-mytrade-modal-buttons .card-mytrade-btn-confirm:hover {
+    background-color: #45a049;
+    /* Efeito hover verde */
+}
+
+.card-mytrade-modal-buttons .card-mytrade-btn-cancel:hover {
+    background-color: #e53935;
+    /* Efeito hover vermelho */
+}
+
+
+/*Fim modal trade*/
+
+
+/*Landing page*/
+.content-section {
+    display: flex;
+    /* Utiliza flexbox para alinhamento */
+    justify-content: space-between;
+    /* Espaçamento entre texto e imagem */
+    margin: 40px 80px;
+    line-height: 1.8;
+    /* Ajuste para maior espaçamento entre as linhas */
+    max-width: 100%;
+    /* Limita a largura do conteúdo */
+}
+
+/* Estilo da área de texto */
+.text-area {
+    max-width: 70%;
+    /* Limita a largura da área de texto */
+}
+
+/* Estilo da área da imagem */
+.image-area {
+    max-width: 35%;
+    /* Limita a largura da área da imagem */
+}
+
+/* Imagem responsiva */
+.responsive-image {
+    width: 100%;
+    /* Faz com que a imagem ocupe toda a largura da área */
+    height: auto;
+    /* Mantém a proporção da imagem */
+    border-radius: 10px;
+    /* Bordas arredondadas para a imagem */
+}
+
+/* Estilos para cabeçalhos */
+.content-section h3,
+.content-section h4 {
+    color: var(--main-red);
+    margin-bottom: 15px;
+}
+
+/* Estilos para parágrafos */
+.content-section p {
+    color: var(--main-white);
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Estilos para listas */
+.content-section ul,
+.content-section ol {
+    margin-left: 0px;
+    margin-bottom: 0px;
+}
+
+.content-section ul li,
+.content-section ol li {
+    font-size: 17px;
+    color: var(--main-white);
+    margin-bottom: 10px;
+    list-style: none;
+    /* Remove marcadores de lista */
+}
+
+/* Destaque de texto */
+.highlight-text {
+    color: var(--main-red);
+    /* Utiliza a variável de cor já configurada */
+}
+
+/* Estilo para o link de voltar */
+.back-link {
+    color: var(--main-red);
+    text-decoration: none;
+    font-size: 16px;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+    /* Adiciona sublinhado ao passar o mouse */
+}
+
+
+/*Fim da landing page*/
+
+body {
+    background: var(--main-bg);
+}
+
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    background: var(--main-black);
+}
+
+
+.auth-left h1 {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--main-red);
+    font-size: 25px;
+}
+
+.auth-left h2 {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--main-red);
+    font-size: 20px;
+}
+
+.auth-left {
+    width: 55%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
+    /* box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.13); */
+
+}
+
+.auth-left form {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.input-div {
+    position: relative;
+    margin: auto;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 14px;
+}
+
+.input-div.login {
+    margin-top: 20px;
+}
+
+input {
+    color: var(--main-white);
+}
+
+.input-div input,
+select {
+    padding: 12px 12px 12px 42px;
+    border: 1px solid rgba(255, 255, 255, 0.185);
+    border-radius: 8px;
+    color: var(--main-white);
+    outline: none;
+    width: 100%;
+    background: transparent;
+    /* border-radius: 7px; */
+    transition: all ease 0.2s;
+}
+
+.search-bar {
+    display: flex;
+    margin: 20px 0;
+}
+
+.search-input {
+    padding: 10px;
+    color: white;
+    background: var(--main-bg);
+    border: 1px solid rgba(255, 255, 255, 0.185);
+    border-radius: 5px;
+    width: 300px;
+    transition: box-shadow 0.3s ease;
+}
+
+.search-input input {
+    color: var(--main-white);
+}
+
+.search-button {
+    padding: 10px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.search-clear {
+    padding: 10px;
+    width: 80px;
+    background-color: #28a745;
+    /* Verde Bootstrap */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.search-clear:hover {
+    background-color: #218838;
+    /* Cor de fundo ao passar o mouse */
+}
+
+
+.search-input:focus {
+    outline: none;
+    /* Remove o contorno padrão do input */
+}
+
+.search-button:hover {
+    background-color: var(--main-red);
+    /* Cor ao passar o mouse */
+}
+
+.search-div select:hover {
+    cursor: pointer;
+}
+
+.input-div textarea {
+    padding: 15px 15px 15px 45px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    color: #1a1717;
+    outline: none;
+    width: 100%;
+    background: transparent;
+    /* border-radius: 7px; */
+    transition: all ease 0.2s;
+}
+
+.input-div label {
+    margin-top: 4px;
+    color: var(--main-red);
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.input-div i.fas {
+    position: absolute;
+    width: 50px;
+    height: 42px;
+    top: 16px;
+    left: 18px;
+    font-size: 13px;
+    color: var(--main-red);
+    font-size: 14px;
+}
+
+.input-div button:hover {
+    filter: brightness(90%);
+}
+
+.toast-top-right {
+    margin-top: 80px;
+}
+
+.toast-top-right .toast-error {
+    background: var(--main-red);
+}
+
+.auth-right {
+    width: 65%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.input-div img {
+    margin: auto;
+    border-radius: 50%;
+}
+
+.auth-right img {
+    width: 90%;
+    height: 100%;
+    margin-top: 20px;
+}
+
+.auth-right>h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--main-red);
+}
+
+/*Modal*/
+/* Estilos gerais */
+
+/* Estilos específicos para o modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.342)
+}
+
+.modal-content {
+    background-color: var(--main-bg);
+    /* Cor de fundo do conteúdo do modal */
+    margin: 15% auto;
+    /* Centraliza o modal verticalmente e o posiciona a 15% da parte superior */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    /* Largura máxima do modal */
+}
+
+.close-modal {
+    color: var(--main-white);
+    /* Cor do botão de fechar */
+    float: right;
+    /* Alinha o botão de fechar à direita */
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: var(--main-white);
+    /* Cor do botão de fechar ao passar o mouse ou focar */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    display: flex;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.modal-buttons form {
+    width: 50%;
+}
+
+.modal-buttons div {
+    width: 50%;
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: 8px 18px;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.btn-search {
+    border-radius: 5px;
+}
+
+.btn-confirm:hover {
+    filter: brightness(80%);
+}
+
+.btn-cancel {
+    width: 100%;
+    padding: 8px 18px;
+    background-color: var(--main-red);
+    margin-left: 10px;
+    color: var(--main-white);
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.btn-cancel:hover {
+    filter: brightness(80%);
+}
+
+.btn-on {
+    margin-top: 10px;
+    height: 40px;
+    font-size: 16px;
+    color: var(--main-white);
+    font-weight: bold;
+    border: none;
+    text-align: center;
+    background: var(--main-red);
+    border-radius: 5px;
+    outline: none;
+    width: 100%;
+    /* border-radius: 7px; */
+    transition: all ease 0.2s;
+    cursor: pointer;
+}
+
+.btn-off {
+    height: 45px;
+    font-size: 16px;
+    color: var(--main-black);
+    font-weight: bold;
+    border: none;
+    text-align: center;
+    background: var(--main-red);
+    outline: none;
+    width: 100%;
+    border-radius: 7px;
+    transition: all ease 0.2s;
+    cursor: pointer;
+    opacity: 0.3;
+}
+
+.btn-on:hover,
+.btn-off:hover {
+    box-shadow: 0 0 10px rgba(26, 25, 25, 0.3);
+    /* Sombra ao passar o mouse */
+}
+
+.div-auth-links {
+    margin-top: 18px;
+    width: 100%;
+    padding-left: 104px;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-links {
+    margin-top: 5px;
+    color: var(--main-white);
+    font-weight: 0;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.auth-links:hover {
+    text-decoration: underline;
+}
+
+.small-err-div {
+    margin-top: 0px;
+    padding: 1px;
+    margin-top: 2px;
+    padding-top: 1px;
+}
+
+.form-text {
+    color: rgb(242, 57, 57);
+    margin-left: 3px;
+    font-size: 13px;
+}
+
+/*API BOOK*/
+/* public/styles/book-api.css */
+/*API BOOK*/
+/* public/styles/book-api.css */
+
+.api-book-search-bar {
+    margin: 20px;
+    margin-top: 0px;
+}
+
+.api-book-search-input {
+    padding: 10px;
+    margin-right: 10px;
+    width: 300px;
+    background: none;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 16px;
+    transition: border-color 0.3s;
+    /* Para uma transição suave */
+}
+
+.api-book-prompt {
+    color: var(--main-white);
+    margin: auto;
+    margin-left: 12px;
+}
+
+.api-book-search-input:focus {
+    outline: none;
+    /* Remove a borda padrão de foco do navegador */
+}
+
+.api-book-search-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.api-book-results-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.api-book-card {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.api-book-cover img {
+    max-width: 100px;
+    margin-right: 10px;
+}
+
+.api-book-info {
+    flex-grow: 1;
+}
+
+.api-book-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--main-white);
+}
+
+.api-book-info p {
+    color: var(--main-red);
+}
+
+.api-book-info strong {
+    color: var(--main-white);
+}
+
+.api-book-authors,
+.api-book-pages,
+.api-book-description,
+.api-book-publisher,
+.api-book-published-date {
+    margin: 5px 0;
+}
+
+
+/*FIM API BOOK*/
+
+@media(max-width:750px) {
+    .auth-right {
+        display: none;
+    }
+
+    .auth-left {
+        width: 100%;
+        margin: auto;
+    }
+
+    .search-bar .search-clear {
+        margin-top: 10px;
+    }
+
+    .image-area {
+        display: none;
+    }
+
+    .text-area {
+        max-width: 100%;
+    }
+
+    .card-mytrade-images {
+        display: none;
+    }
+
+    .card-mytrade-card {
+        width: 100%;
+    }
+
+    .card-mytrade-card-content {
+        width: 100%;
+    }
+}
+
+@media(max-width:450px) {
+    .auth-left {
+        width: 100%;
+    }
+}
+
+/* Livros */
+.search-container {
+    display: flex;
+    align-items: center;
+    margin: auto;
+    width: 90%;
+    padding: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    /* Espaço abaixo do container */
+}
+
+.search-div {
+    width: 40%;
+    display: flex;
+}
+
+select {
+    background-color: var(--main-bg);
+    /* Cor de fundo do select */
+    color: #fff;
+    /* Cor do texto das opções */
+    border: 1px solid #444;
+    /* Bordas do select */
+    padding: 8.7px;
+    /* Padding para melhor aparência */
+    border-radius: 5px;
+    /* Bordas arredondadas */
+    appearance: none;
+    /* Remove o estilo padrão do select */
+    cursor: pointer;
+    /* Mudança de cursor para indicar interação */
+    margin-right: 10px;
+}
+
+.search-div input {
+    padding: 8px 8px 8px 45px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    color: var(--main-white);
+    outline: none;
+    width: 98%;
+    background: transparent;
+    transition: all ease 0.2s;
+}
+
+.input:focus {
+    background-color: var(--main-bg);
+    /* Mantém a cor de fundo */
+}
+
+.search-div input:focus {
+
+    /* Remover a cor da borda ao focar */
+
+    /* Sombra ao focar */
+}
+
+.search-div button {
+    padding: 8px 18px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.search-btn-div button:hover {
+    filter: brightness(80%);
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    /* Modificação aqui */
+    gap: 20px;
+    padding: 30px;
+}
+
+.card {
+    display: flex;
+    min-width: 200px;
+    /* Largura mínima dos itens */
+    max-width: 250px;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 0px;
+    overflow: hidden;
+    height: 420px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+    width: 100%;
+    height: 80%;
+    object-fit: cover;
+    border-radius: 0px 0px 0 0;
+}
+
+.card-content {
+    padding: 18px;
+    position: relative;
+}
+
+.card-content a {
+    text-decoration: none;
+    color: var(--main-red);
+    font-weight: bold;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-content p {
+    color: #777;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn {
+    display: block;
+    width: 98%;
+    margin-top: 16px;
+    padding: 10px 18px;
+    font-weight: bold;
+    font-size:15px;
+    background-color: var(--main-red);
+    border-radius: 5px;
+    color: var(--main-white);
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.btn:hover {
+    filter: brightness(80%);
+}
+
+.div-pagination {
+    width: 80%;
+    margin-left: 74px;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    /* Alinhar à esquerda */
+    margin-top: 10px;
+    /* Adicionar margem superior para afastar da borda */
+}
+
+
+.div-pagination ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.div-pagination ul li {
+    margin: 0 5px;
+    /* Ajuste o espaçamento entre os itens conforme necessário */
+}
+
+.div-pagination ul li a {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.div-pagination ul li a:hover {
+    filter: brightness(80%);
+}
+
+/*Book Details */
+
+.main-details {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 20px;
+    min-height: 100vh;
+    overflow: auto;
+}
+
+.md-links {
+    display: flex;
+    flex-direction: row;
+    margin-left: 18px;
+}
+
+.md-links a {
+    color: var(--main-red);
+    text-decoration: underline;
+}
+
+.md-links p {
+    margin-left: 10px;
+    color: var(--main-white);
+    font-style: italic;
+}
+
+.md-links a:hover {
+    text-decoration: underline;
+}
+
+.book-details {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.user-details {
+    margin-left: 100px;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    padding: 10px;
+}
+
+h3 {
+    color: #6d5c09;
+}
+
+/*Profile*/
+/* Estilo do container principal */
+.user-profile {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+}
+
+/* Seção de livros */
+.user-books {
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
+/*My Books*/
+
+/* Layout principal */
+.mybooks-section {
+    margin: 20px 80px;
+}
+
+.mybooks-no-books {
+    color: var(--main-red);
+    font-style: italic;
+    margin-top: 40px;
+}
+
+.mybooks-header {
+    margin-top: 30px;
+    color: var(--main-red);
+}
+
+.edit-profile-button {
+    background-color: var(--main-red);
+    /* Verde */
+    color: white;
+    /* Texto branco */
+    border: none;
+    /* Sem borda */
+    padding: 10px 15px;
+    /* Espaçamento interno */
+    text-align: center;
+    /* Alinhamento do texto */
+    text-decoration: none;
+    /* Sem sublinhado */
+    display: inline-block;
+    /* Permite definir largura e altura */
+    margin-top: 10px;
+    /* Espaçamento acima */
+    cursor: pointer;
+    /* Muda o cursor para ponteiro ao passar o mouse */
+    border-radius: 5px;
+    /* Bordas arredondadas */
+}
+
+.edit-profile-button:hover {
+    background-color: #45a049;
+    /* Escurece ao passar o mouse */
+}
+
+/* Paginação */
+.mybooks-pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination-list {
+    display: inline-block;
+    padding: 0;
+    list-style-type: none;
+}
+
+.pagination-item {
+    display: inline;
+    margin-right: 5px;
+}
+
+.pagination-link {
+    padding: 8px 12px;
+    background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.pagination-item.active .pagination-link {
+    background-color: var(--main-red);
+    color: white;
+}
+
+/* Barra de busca */
+.mybooks-search-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.mybooks-category-select,
+.mybooks-search-input {
+    padding: 8px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.mybooks-btn-search {
+    padding: 8px 16px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Grid de livros */
+.mybooks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* Card do livro */
+.mybooks-card {
+    background-color: var(--main-white);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 180px;
+}
+
+.mybooks-cover {
+    margin-bottom: 10px;
+}
+
+.mybooks-cover {
+    width: 100%;
+}
+
+.mybooks-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.mybooks-info {
+    margin-bottom: 8px;
+}
+
+.mybooks-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.mybooks-author,
+.mybooks-category,
+.mybooks-code {
+    font-size: 12px;
+    color: #666;
+    margin: 2px 0;
+}
+
+/* Botão Remover */
+.mybooks-btn-remove {
+    width: 90%;
+    padding: 6px 10px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: 5px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .mybooks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mybooks-card {
+        width: 100%;
+    }
+
+    .mybooks-image {
+        width: 100%;
+        height: auto;
+    }
+}
+
+
+/*End My Books*/
+
+.book-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px;
+    list-style: none;
+    padding: 0;
+}
+
+.book-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease;
+    width: 150px;
+}
+
+.book-list li:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.book-cover img {
+    width: 100px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+
+.book-info {
+    margin-top: 0px;
+}
+
+.book-info h2 {
+    margin-bottom: 5px;
+    color: var(--main-white);
+}
+
+.book-info p {
+    font-size: 18px;
+    color: var(--main-white);
+}
+
+/*Book card*/
+
+
+/*End Book card*/
+
+.user-image img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.user-info {
+    margin-left: 20px;
+}
+
+.user-info h2 {
+    color: var(--main-white);
+    margin-bottom: 10px;
+}
+
+.user-rating {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.star {
+    font-size: 20px;
+    color: gold;
+    margin-right: 5px;
+}
+
+.user-info p {
+    margin: 5px 0;
+    color: var(--main-white);
+    font-size: 16px;
+}
+
+/*End Profile*/
+
+
+.book-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.book-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-info {
+    display: flex;
+    max-height: 100%;
+    flex-direction: column;
+    padding-left: 0px;
+}
+
+.book-action {
+    display: flex;
+    max-height: 100%;
+    padding: 14px;
+    font-style: italic;
+    flex-direction: column;
+}
+
+.book-property {
+    display: flex;
+    width: 100%;
+    height: 300px;
+    flex-direction: column;
+}
+
+.book-property strong {
+    color: var(--main-red);
+}
+
+.book-property p {
+    color: var(--main-white);
+    margin-left: 5px;
+}
+
+.book-property h2 {
+    color: var(--main-white);
+}
+
+.btn:hover {
+    filter: brightness(80%);
+}
+
+@media screen and (max-width: 900px) {
+    .book-info {
+        margin-top: 20px;
+    }
+
+    .book-details {
+        display: block;
+    }
+
+    .book-image,
+    .book-info,
+    .book-button {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width:700px) {
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 98%;
+        padding: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+        /* Espaço abaixo do container */
+    }
+
+    .search-div {
+        width: 90%;
+        display: flex;
+    }
+
+    .search-div select {
+        padding: 10px 10px 8px 40px;
+        border: 1px solid rgba(128, 128, 128, 0.5);
+        color: var(--main-white);
+        outline: none;
+        width: 90%;
+        transition: all ease 0.2s;
+    }
+
+    .search-div input {
+        margin-top: 10px;
+        padding: 8px 8px 8px 45px;
+        border: 1px solid rgba(128, 128, 128, 0.5);
+        outline: none;
+        width: 90%;
+        background: transparent;
+        transition: all ease 0.2s;
+    }
+
+    /* .search-btn-div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width:90%;
+        margin-top: 20px;
+    } */
+    .search-div button {
+        margin-top: 10px;
+        width: 90%;
+    }
+}
+
+/*Table*/
+.main-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-content p {
+    margin-top: 10px;
+    margin-left: 80px;
+    color: var(--main-white);
+}
+
+.main-content h1 {
+    margin-top: 30px;
+    margin-left: 80px;
+    font-weight: bold;
+    color: var(--main-red)
+}
+
+.table-responsive {
+    margin-top: 0px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table {
+    width: 90%;
+    padding: 20px;
+}
+
+.table thead tr {
+    color: var(--main-white);
+}
+
+.table th,
+.table td {
+    padding: 8px;
+
+}
+
+.table td {
+    color: var(--main-red);
+    font-weight: bold;
+}
+
+.limited-characters {
+    max-width: 100px;
+    /* Defina a largura máxima que você deseja permitir */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* Adiciona reticências (...) quando o texto for cortado */
+}
+
+.table-link {
+    color: var(--main-red);
+    font-weight: bold;
+}
+
+.table-link:hover {
+    text-decoration: underline;
+}
+
+.table thead {
+    background: var(--main-red);
+}
+
+.select-offer {
+    padding: 6px 6px 8px 40px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    color: var(--main-white);
+    outline: none;
+    width: 98%;
+    background: transparent;
+    transition: all ease 0.2s;
+}
+
+
+.table-btn-edit {
+    width: 100%;
+    padding: 8px 18px;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.table-btn-edit:hover {
+    filter: brightness(80%);
+}
+
+.table-btn-remove {
+    margin-top: 10px;
+    width: 100%;
+    padding: 8px 18px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    border-radius: 5px;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.table-btn-remove:hover {
+    filter: brightness(80%);
+}
+
+.pagination {
+    margin-top: 20px;
+}
+
+.btn-pagination {
+    padding: 8px 16px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.btn-pagination:hover {
+    background-color: #45a049;
+}
+
+/*Solicitation page*/
+.trade-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    width: 98%;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.my-books,
+.other-user-book {
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.my-books h2,
+.other-user-book h2 {
+    margin-bottom: 10px;
+}
+
+.my-books form {
+    margin-bottom: 20px;
+}
+
+.my-books select {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(75, 63, 65, 0.308);
+    font-size: 16px;
+}
+
+.my-books select:hover {
+    cursor: pointer;
+}
+
+.my-books .btn-confirm {
+    background-color: var(--main-green);
+    color: var(--main-white);
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.my-books .btn-confirm:hover {
+    filter: brightness(90%);
+}
+
+.my-books strong {
+    color: var(--main-red);
+}
+
+.my-books p {
+    color: var(--main-white);
+}
+
+.other-user-book-details {
+    text-align: left;
+
+}
+
+.other-user-book-details h3,
+.other-user-book-details p {
+    margin-left: 10px;
+    color: var(--main-white);
+    font-weight: bold;
+}
+
+.other-user-book-details {
+    display: flex;
+    flex-direction: column;
+
+    max-width: 100%;
+    max-height: 100%;
+    /* Defina a altura desejada */
+    overflow: hidden;
+    /* Para garantir que imagens maiores não extrapolem a altura */
+}
+
+.other-user-book-details .book-image {
+    width: 200px;
+    background: #000;
+}
+
+.other-user-book-details .book-image img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+/*Toast*/
+.custom-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: var(--main-white);
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+}
+
+.custom-toast.show {
+    display: block;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+    from {
+        bottom: 0;
+        opacity: 0;
+    }
+
+    to {
+        bottom: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        bottom: 20px;
+        opacity: 1;
+    }
+
+    to {
+        bottom: 0;
+        opacity: 0;
+    }
+}
+
+/* Fixando o botão e o plugin na parte inferior da tela */
+.vw-plugin-wrapper {
+    position: fixed;
+    bottom: 0; /* Fixa no rodapé */
+    left: 0;
+    width: 100%; /* Ocupa toda a largura da tela */
+    z-index: 10000; /* Garante que fique acima de outros elementos */
+}
+
+/* O botão de acessibilidade também será fixado no canto inferior */
+.vw-access-button {
+    position: fixed;
+    bottom: 20px; /* Distância do fundo da tela */
+    left: 20px; /* Distância da lateral esquerda */
+    z-index: 10001; /* Certifica que o botão sempre ficará acima do plugin */
+}
+
+/* Se o botão ou plugin interferir em conteúdo, ajuste a posição */
+@media (max-width: 768px) {
+    .vw-access-button {
+        bottom: 20px; /* Ajuste conforme necessário */
+        left: 20px; /* Para telas menores */
+    }
+
+    .vw-plugin-wrapper {
+        bottom: 0;
+    }
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca livre</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <img src="/relogo.png" alt="Logo" style="height: 50px; width: auto;">
+        </div>
+        <ul id="menuList">
+            <!-- Verifica se o usuário está logado antes de exibir o ícone de notificação -->
+            <% if (req.session.userId) { %>
+                <div class="notification-icon">
+                    <i class="fa-solid fa-bell" onclick="toggleNotifications()"></i>
+                    <span class="notification-count">
+                        <%= req.session.notificationCount || 0 %>
+                    </span>
+                    <ul id="notificationMenu" class="submenu">
+                        <% if (req.session.notifications && req.session.notifications.length> 0) { %>
+                            <% req.session.notifications.forEach(notification=> { %>
+                                <li>
+                                    <form action="/notifications/read/<%= notification.id %>" method="POST"
+                                        style="display: inline;">
+                                        <a href="javascript:void(0);" onclick="this.closest('form').submit();"
+                                            style="text-decoration: underline; cursor: pointer;">
+                                            <%= notification.message %>
+                                        </a>
+                                    </form>
+                                </li>
+                                <% }) %>
+                                    <% } else { %>
+                                        <li><a href="#">Nenhuma notificação</a></li>
+                                        <% } %>
+                    </ul>
+                </div>
+                <% } %>
+
+                    <li><a href="/">Início</a></li>
+                    <% if (req.session.userId) { %>
+                        <li><a href="#">Livros</a>
+                            <ul class="submenu">
+                                <li><a href="/books">Todos os Livros</a></li>
+                                <li><a href="/mybooks">Minha estante</a></li>
+                                <li><a href="/books/add">Adicionar Livro</a></li>
+                                <li><a href="/books/book-details">Consultar livro</a></li>
+                            </ul>
+                        </li>
+                        <% if (req.session.isAdmin) { %>
+                            <li><a href="#">Admin</a>
+                                <ul class="submenu">
+                                    <li><a href="/books/admin/book-request">Solicitações de Adição (<%=
+                                                req.session.pending %>
+                                                )</a></li>
+                                </ul>
+                            </li>
+                            <% } %>
+                                <li><a href="#">Trades</a>
+                                    <ul class="submenu">
+                                        <li><a href="/trade/reqlist">Solicitações</a></li>
+                                        <li><a href="/trade/mytrades">Minhas Trades</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#">Minha Conta</a>
+                                    <ul class="submenu">
+                                        <li><a href="/edit-profile">Editar Perfil</a></li>
+                                        <li><a href="/logout">Sair</a></li>
+                                    </ul>
+                                </li>
+                                <% } else { %>
+                                    <li><a href="/login">Entrar</a></li>
+                                    <% } %>
+        </ul>
+        <div class="menu-icon">
+            <i class="fa-solid fa-bars" onclick="toggleMenu()"></i>
+        </div>
+    </nav>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuItems = document.querySelectorAll('nav ul li a');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                const submenu = this.nextElementSibling;
+                if (submenu && submenu.classList.contains('submenu')) {
+                    e.preventDefault();
+                    // Fechar todos os submenus
+                    document.querySelectorAll('nav ul li ul.submenu').forEach(s => {
+                        if (s !== submenu) {
+                            s.style.display = 'none'; // Fecha outros submenus
+                        }
+                    });
+                    // Alternar o submenu clicado
+                    submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+                }
+            });
+        });
+    });
+
+    function toggleNotifications() {
+        const notificationMenu = document.getElementById('notificationMenu');
+        // Fechar outros menus abertos (se houver)
+        document.querySelectorAll('nav ul.submenu').forEach(submenu => {
+            if (submenu !== notificationMenu) {
+                submenu.style.display = 'none';
+            }
+        });
+        // Exibir/esconder o menu de notificações
+        notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
+    }
+    function formatNotificationDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds} segundo(s) atrás`;
+        } else if (diffInSeconds < 3600) {
+            return `${Math.floor(diffInSeconds / 60)} minuto(s) atrás`;
+        } else if (diffInSeconds < 86400) {
+            return `${Math.floor(diffInSeconds / 3600)} hora(s) atrás`;
+        } else {
+            return date.toLocaleDateString(); // Exibe a data completa para notificações mais antigas
+        }
+    }
+</script>
+
+</html>

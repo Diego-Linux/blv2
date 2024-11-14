@@ -1,0 +1,65 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+<div class="auth-container">
+    <div class="auth-left">
+        <h2>Editar Perfil</h2>
+        <form action="/update-profile" method="POST" enctype="multipart/form-data">
+            <div class="input-div">
+                <% if (user.image) { %>
+                    <img id="avatar" src="<%= user.image %>" alt="Avatar" 
+                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 50;"/>
+                <% } else { %>
+                    <img id="avatar" src="" alt="Avatar" 
+                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 50; display: none;"/>
+                <% } %>
+            </div>
+            <div class="input-div">
+                <label for="image">Selecionar Imagem:</label>
+                <input type="file" id="image" name="image" accept="image/*"> <!-- Campo para upload da imagem -->
+            </div>
+            <div class="input-div">
+                <input type="text" id="name" name="name" value="<%= user.name %>" placeholder="Seu nome">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="input-div">
+                <input type="email" id="email" name="email" value="<%= user.email %>" placeholder="Seu email">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="input-div">
+                <button type="submit" class="btn-on">Atualizar</button>
+            </div>
+        </form>
+        <% if (authError) { %>
+            <script>
+                toastr.error(`<%= authError %>`);
+            </script>
+        <% } %>
+        <% if (success) { %>
+            <script>
+                toastr.success(`<%= success %>`);
+            </script>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    const imageInput = document.getElementById('image');
+    const avatar = document.getElementById('avatar');
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0]; // Obtém o primeiro arquivo selecionado
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                avatar.src = e.target.result; // Atualiza o src da imagem com a pré-visualização
+                avatar.style.display = 'block'; // Mostra a imagem
+            }
+            reader.readAsDataURL(file); // Lê o arquivo como uma URL de dados
+        } else {
+            avatar.src = ""; // Limpa a imagem se nenhum arquivo for selecionado
+            avatar.style.display = 'none'; // Esconde a imagem
+        }
+    });
+</script>
+
+<% include footer.ejs %>

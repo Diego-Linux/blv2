@@ -1,0 +1,63 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+<div class="main-details">
+    <div class="md-links">
+        <a href="#" onclick="history.back()">Voltar | </a>
+    </div>
+
+    <!-- Seção de detalhes do usuário -->
+    <div class="user-profile">
+        <div class="user-image">
+            <% if (user.image) { %>
+                <img src="/<%= user.image %>" alt="Foto de <%= user.name %>">
+            <% } else { %>
+                <p>Imagem não disponível</p>
+            <% } %>
+        </div>
+        <div class="user-info">
+            <h2><%= user.name %></h2>
+            <div class="user-rating">
+                <span class="star">&#9733;</span>
+                <span class="star">&#9733;</span>
+                <span class="star">&#9733;</span>
+                <span class="star">&#9733;</span>
+                <span class="star">&#9734;</span>
+            </div>
+            <p>Membro desde: <%= user.joinedDate %></p>
+            <p>Trades realizadas: <%= user.threadsCount %></p>
+            <% if (user.id === currentUser.id) { %> <!-- Verifica se é o próprio usuário -->
+                <p class="own-profile-message" style="color: #45A049; font-weight: bold;">Você está na sua página!</p>
+                <button class="edit-profile-button" onclick="window.location.href='/edit-profile'">Editar Perfil</button> <!-- Botão para editar perfil -->
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Seção de pesquisa -->
+    <div class="search-bar">
+        <form action="/user/<%= user.id %>" method="GET">
+            <input type="text" name="search" placeholder="Livros disponíveis deste usuário..." class="search-input" value="<%= searchQuery || '' %>">
+            <button type="submit" class="search-button">Pesquisar</button>
+            <button type="button" class="search-clear" onclick="window.location.href='/mybooks';">Limpar</button>
+        </form>
+    </div>
+    
+    <!-- Seção de livros disponíveis -->
+    <div class="user-books">
+        <ul class="book-list">
+            <% books.forEach(function(book) { %>
+                <li class="book-card">
+                    <a href="/books/<%= book.id %>"class="book-link">
+                        <div class="book-cover">
+                            <img src="/<%= book.image %>" alt="Capa de <%= book.title %>">
+                        </div>
+                        <div class="book-info">
+                            <p class="book-title"><%= book.name %></p>
+                        </div>
+                    </a>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
+
+<% include footer.ejs %>
