@@ -33,4 +33,6 @@ Notification.belongsTo(User, { foreignKey: 'receiver_id', as: 'receiver' });
 // Associação entre Notificação e Usuário (usuário que gerou a notificação, ex: quem solicitou a troca)
 Notification.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 
+// database.sync({alter:true})
+
 module.exports = Notification;

@@ -11,76 +11,90 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
-<body>
+
+<body class="fade">
     <nav>
         <div class="logo">
             <img src="/relogo.png" alt="Logo" style="height: 50px; width: auto;">
         </div>
-        <ul id="menuList">
-            <!-- Verifica se o usuário está logado antes de exibir o ícone de notificação -->
-            <% if (req.session.userId) { %>
-                <div class="notification-icon">
-                    <i class="fa-solid fa-bell" onclick="toggleNotifications()"></i>
-                    <span class="notification-count">
-                        <%= req.session.notificationCount || 0 %>
-                    </span>
-                    <ul id="notificationMenu" class="submenu">
-                        <% if (req.session.notifications && req.session.notifications.length> 0) { %>
-                            <% req.session.notifications.forEach(notification=> { %>
-                                <li>
-                                    <form action="/notifications/read/<%= notification.id %>" method="POST"
-                                        style="display: inline;">
-                                        <a href="javascript:void(0);" onclick="this.closest('form').submit();"
-                                            style="text-decoration: underline; cursor: pointer;">
-                                            <%= notification.message %>
-                                        </a>
-                                    </form>
-                                </li>
-                                <% }) %>
-                                    <% } else { %>
-                                        <li><a href="#">Nenhuma notificação</a></li>
-                                        <% } %>
-                    </ul>
-                </div>
-                <% } %>
+       <ul id="menuList">
+  <% if (req.session.userId) { %>
+    <div class="notification-icon" onclick="toggleNotifications()">
+      <i class="fas fa-bell"></i>
+      <span class="notification-count">
+        <%= req.session.notificationCount || 0 %>
+      </span>
+      <ul id="notificationMenu" class="submenu notif" style="max-height: 300px; overflow-y: auto;">
+        <% if (req.session.notifications && req.session.notifications.length > 0) { %>
+          <% req.session.notifications.forEach(notification => { %>
+            <li style="display: flex; flex-direction: column; padding: 8px 12px;">
+              <form action="/notifications/read/<%= notification.id %>" method="POST" style="display:inline;">
+                <% let redirectTo = '/'; const msg = notification.message.toLowerCase(); if (msg.includes('recebeu')) {
+                  redirectTo = '/trade/reqlist'; } else if (msg.includes('aceitou') || msg.includes('foi aceita') ||
+                  msg.includes('cancelada') || msg.includes('confirmou') || msg.includes('concluída')) {
+                  redirectTo = '/trade/mytrades'; } %>
+                  <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
+                  <button type="submit" class="notification-btn">
+                    <%= notification.message %>
+                  </button>
+              </form>
+              <small style="font-size: 15px; color: #888;">
+                <%= new Date(notification.createdAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) %>
+              </small>
+            </li>
+          <% }) %>
+        <% } else { %>
+        <li class="no-notification">
+  <i class="fas fa-inbox"></i> Sem novas notificações
+</li>
 
-                    <li><a href="/">Início</a></li>
-                    <% if (req.session.userId) { %>
-                        <li><a href="#">Livros</a>
-                            <ul class="submenu">
-                                <li><a href="/books">Todos os Livros</a></li>
-                                <li><a href="/mybooks">Minha estante</a></li>
-                                <li><a href="/books/add">Adicionar Livro</a></li>
-                                <li><a href="/books/book-details">Consultar livro</a></li>
-                            </ul>
-                        </li>
-                        <% if (req.session.isAdmin) { %>
-                            <li><a href="#">Admin</a>
-                                <ul class="submenu">
-                                    <li><a href="/books/admin/book-request">Solicitações de Adição (<%=
-                                                req.session.pending %>
-                                                )</a></li>
-                                </ul>
-                            </li>
-                            <% } %>
-                                <li><a href="#">Trades</a>
-                                    <ul class="submenu">
-                                        <li><a href="/trade/reqlist">Solicitações</a></li>
-                                        <li><a href="/trade/mytrades">Minhas Trades</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="#">Minha Conta</a>
-                                    <ul class="submenu">
-                                        <li><a href="/edit-profile">Editar Perfil</a></li>
-                                        <li><a href="/logout">Sair</a></li>
-                                    </ul>
-                                </li>
-                                <% } else { %>
-                                    <li><a href="/login">Entrar</a></li>
-                                    <% } %>
+        <% } %>
+      </ul>
+    </div>
+  <% } %>
+
+  <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+
+  <% if (req.session.userId) { %>
+    <li><a href="#"><i class="fas fa-book"></i> Livros <i class="fas fa-chevron-down"></i></a>
+      <ul class="submenu">
+        <li><a href="/books"><i class="fas fa-book-open"></i>Disponíveis</a></li>
+        <li><a href="/mybooks"><i class="fas fa-book"></i> Minha estante</a></li>
+        <li><a href="/books/add"><i class="fas fa-plus-circle"></i> Adicionar Livro</a></li>
+        <li><a href="/books/book-details"><i class="fas fa-search"></i> Consultar livro</a></li>
+        <li><a href="/books/titles"><i class="fas fa-star"></i> Resenhas</a></li>
+      </ul>
+    </li>
+
+    <% if (req.session.isAdmin) { %>
+      <li><a href="#"><i class="fas fa-tools"></i> Administrador <i class="fas fa-chevron-down"></i></a>
+        <ul class="submenu">
+          <li><a href="/books/admin/book-request"><i class="fas fa-clipboard-check"></i> Pedidos(<%= req.session.pending %>)</a></li>
+          <li><a href="/books/titles/add"><i class="fas fa-pen"></i> Nova resenha</a></li>
         </ul>
+      </li>
+    <% } %>
+
+    <li><a href="#"><i class="fas fa-exchange-alt"></i> Trades <i class="fas fa-chevron-down"></i></a>
+      <ul class="submenu">
+        <li><a href="/trade/reqlist"><i class="fas fa-handshake"></i> Solicitações</a></li>
+        <li><a href="/trade/mytrades"><i class="fas fa-list"></i> Minhas Trades</a></li>
+      </ul>
+    </li>
+
+    <li><a href="#"><i class="fas fa-user"></i> Minha conta <i class="fas fa-chevron-down"></i></a>
+      <ul class="submenu">
+        <li><a href="/edit-profile"><i class="fas fa-user-cog"></i> Editar perfil</a></li>
+        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Desconectar</a></li>
+      </ul>
+    </li>
+  <% } else { %>
+    <li><a href="/login"><i class="fas fa-sign-in-alt"></i> Entrar</a></li>
+  <% } %>
+</ul>
+
         <div class="menu-icon">
-            <i class="fa-solid fa-bars" onclick="toggleMenu()"></i>
+            <i class="fas fa-solid fa-bars" onclick="toggleMenu()"></i>
         </div>
     </nav>
 </body>

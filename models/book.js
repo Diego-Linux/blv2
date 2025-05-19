@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const database = require('./connection');
 const User = require('./user');
+const Title = require('./title'); // Importa o model Title
 
 const Book = database.define('book', {
     id: {
@@ -23,25 +24,37 @@ const Book = database.define('book', {
     },
     image: {
         type: Sequelize.STRING,
+        allowNull: false
     },
     status: {
         type: Sequelize.STRING,
-        defaultValue: 'pending' // Valor padrão 'available'
+        defaultValue: 'pending'
     },
     description: {
         type: Sequelize.TEXT,
         allowNull: false
     },
     approvalStatus: {
-        type:Sequelize.STRING,
-        defaultValue: 'pending' // Status de aprovação pendente por padrão
+        type: Sequelize.STRING,
+        defaultValue: 'pending'
+    },
+    titleId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'titles',
+            key: 'id'
+        }
     }
 });
 
-User.hasMany(Book,{foreignKey:'userId'})
+// Relacionamentos
+User.hasMany(Book, { foreignKey: 'userId' });
 Book.belongsTo(User, { foreignKey: 'userId' });
 
-// database.sync({alter:true})
+Title.hasMany(Book, { foreignKey: 'titleId' }); // Um título pode estar associado a vários books
+Book.belongsTo(Title, { foreignKey: 'titleId' }); // Um book pode referenciar um título
+
+// database.sync({ alter: true });
 
 module.exports = Book;
-

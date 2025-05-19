@@ -1,0 +1,52 @@
+<% include header.ejs %>
+
+<div class="title-detail-container">
+ <div class="md-links">
+        <a href="#" onclick="goBack()">Voltar</a>
+    </div></br>
+  <div class="title-main-info">
+    <div class="title-image">
+      <img src="/<%= title.image %>" alt="Capa do livro <%= title.name %>" />
+      
+      <div class="rating-section">
+        <% if (title.rating) { %>
+          <p class="rating-text">Avaliação média: <%= title.rating.toFixed(1) %> / 5</p>
+        <% } else { %>
+        </br>
+          <p class="rating-text">Sem avaliações ainda.</p>
+        <% } %>
+
+        <% if (title.comments && title.comments.length > 0) { %>
+          <a href="#comments-section" class="btn-see-comments">Ver Comentários ▼</a>
+          <p class="comment-snippet">“<%= title.comments[0].text.length > 80 ? title.comments[0].text.slice(0, 77) + '...' : title.comments[0].text %>”</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="title-details">
+      <h1><%= title.name %></h1>
+      <p><strong>Autor:</strong> <%= title.author || 'Não informado' %></p>
+      <p><strong>Descrição:</strong></p>
+      <p><%= title.description || 'Sem descrição disponível.' %></p>
+    </div>
+  </div>
+
+  <div id="comments-section" class="title-rating-comments">
+    <h3>Comentários dos usuários:</h3>
+    <% if (title.comments && title.comments.length > 0) { %>
+      <ul>
+        <% title.comments.forEach(comment => { %>
+          <li>
+            <p><strong><%= comment.userName %>:</strong> <%= comment.text %></p>
+            <small><%= new Date(comment.createdAt).toLocaleDateString() %></small>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p style="color:white;">Sem comentários ainda.</p>
+    <% } %>
+  </div>
+
+</div>
+
+<% include footer.ejs %>

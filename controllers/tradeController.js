@@ -42,14 +42,13 @@ exports.requestTrade = async (req, res) => {
                 }
             ]
         });
-
         if (existingTrade) {
-            return res.status(400).json({ error: 'Você já possui uma solicitação pendente para este livro.' });
+            req.flash('validationErrors', 'Você já fez uma solicitação usando este livro.');
+            return res.redirect(`/req/${bookreceiver_id}`);
         }
-
         // Cria a solicitação de troca
         const newTrade = await Trade.create({ status: 'pending' });
-        
+
         // Associa a troca aos usuários e livros envolvidos
         await Usertrade.create({
             sender_id,
@@ -74,7 +73,7 @@ exports.requestTrade = async (req, res) => {
 
         return res.redirect('/mybooks');
     } catch (err) {
-        return res.status(500).json({ error: 'Erro ao solicitar a troca de livros.', details: err.message });
+        res.render('error')
     }
 };
 
@@ -85,8 +84,7 @@ exports.myTrades = async (req, res) => {
     const offset = (page - 1) * perPage;
 
     try {
-        let trades;
-        trades = await Usertrade.findAll({
+        const trades = await Usertrade.findAll({
             where: {
                 [Op.or]: [
                     { receiver_id: userId },
@@ -97,29 +95,33 @@ exports.myTrades = async (req, res) => {
                 {
                     model: Trade,
                     as: 'trade',
-                    where: { status: { [Op.not]: 'pending' } }, // Condição para buscar trocas com status diferente de 'pending'
+                    where: {
+                        status: { [Op.not]: 'rejected' }  // Excluir só as rejeitadas
+                    },
+                    required: true
                 },
                 {
                     model: Book,
                     as: 'bookreceiver',
-                    attributes: ['id', 'name','image']
+                    attributes: ['id', 'name', 'image']
                 },
                 {
                     model: Book,
                     as: 'booksender',
-                    attributes: ['id', 'name','image']
+                    attributes: ['id', 'name', 'image']
                 },
                 {
                     model: User,
                     as: 'sender',
                     attributes: ['id', 'name']
-                }
-                , {
+                },
+                {
                     model: User,
                     as: 'receiver',
                     attributes: ['id', 'name']
                 }
             ],
+            order: [['createdAt', 'DESC']],
             limit: perPage,
             offset: offset,
         });
@@ -130,16 +132,27 @@ exports.myTrades = async (req, res) => {
                     { receiver_id: userId },
                     { sender_id: userId }
                 ]
-            }
+            },
+            include: [
+                {
+                    model: Trade,
+                    as: 'trade',
+                    where: {
+                        status: { [Op.not]: 'rejected' }
+                    },
+                    required: true
+                }
+            ]
         });
+
         const totalPages = Math.ceil(totalCount / perPage);
 
         res.render('mytrades', {
             validationErrors: req.flash('validationErrors'),
-            trades: trades,
-            req: req,
+            trades,
+            req,
             currentPage: page,
-            totalPages: totalPages,
+            totalPages,
         });
     } catch (error) {
         console.error('Erro ao buscar trocas:', error);
@@ -166,17 +179,17 @@ exports.requestsList = async (req, res) => {
                 {
                     model: Book,
                     as: 'bookreceiver',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'image']
                 }, // Use o alias 'bookreceiver' para o livro receptor
                 {
                     model: Book,
                     as: 'booksender',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'image']
                 }, // Use o alias 'booksender' para o livro enviado
                 {
                     model: User,
                     as: 'sender',
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'image']
                 } // Use o alias 'sender' para o usuário que enviou a troca
             ],
             limit: perPage,
@@ -204,11 +217,144 @@ exports.requestsList = async (req, res) => {
 
 exports.acceptTrade = async (req, res) => {
     const tradeId = req.params.id;
+    const userId = req.session.userId;
+
     try {
-        const checkTrade = await Usertrade.findByPk(tradeId, {
+        const usertrade = await Usertrade.findByPk(tradeId, {
             include: [
                 { model: Trade, as: 'trade', where: { status: 'pending' } },
                 { model: Book, as: 'bookreceiver' },
+                { model: Book, as: 'booksender' },
+                { model: User, as: 'receiver' },
+                { model: User, as: 'sender' }
+            ]
+        });
+
+        if (!usertrade || !usertrade.trade) {
+            return res.status(404).send('Troca não encontrada ou já foi aceita.');
+        }
+
+        if (usertrade.sender_id !== userId && usertrade.receiver_id !== userId) {
+            return res.status(403).send('Você não tem permissão para aceitar essa troca.');
+        }
+
+        usertrade.trade.status = 'progress';
+        await usertrade.trade.save();
+
+        usertrade.bookreceiver.status = 'unavailable';
+        usertrade.booksender.status = 'unavailable';
+        await usertrade.bookreceiver.save();
+        await usertrade.booksender.save();
+
+        const acceptedBookReceiverId = usertrade.bookreceiver_id;
+
+        // 1. Cancela outras trocas feitas por qualquer usuário para esse livro (bookreceiver_id)
+        const conflictingTrades = await Usertrade.findAll({
+            where: {
+                bookreceiver_id: acceptedBookReceiverId,
+                id: { [Op.ne]: usertrade.id }
+            },
+            include: [
+                { model: Trade, as: 'trade', where: { status: 'pending' } },
+                { model: User, as: 'sender' }
+            ]
+        });
+
+        for (const otherTrade of conflictingTrades) {
+            otherTrade.trade.status = 'rejected';
+            await otherTrade.trade.save();
+
+            await Notification.create({
+                type: 'trade_update',
+                message: `Sua solicitação de troca pelo livro "${usertrade.bookreceiver.title}" foi automaticamente rejeitada porque o livro já está envolvido em outra troca com ${usertrade.sender.name === otherTrade.sender.name ? usertrade.receiver.name : usertrade.sender.name}.`,
+                isRead: false,
+                receiver_id: otherTrade.sender_id,
+                sender_id: userId
+            });
+        }
+
+        // 2. Cancela todas as outras trocas que o usuário atual FEZ para outros livros
+        const myOtherTrades = await Usertrade.findAll({
+            where: {
+                sender_id: usertrade.sender_id,
+                id: { [Op.ne]: usertrade.id }
+            },
+            include: [
+                { model: Trade, as: 'trade', where: { status: 'pending' } },
+                { model: User, as: 'receiver' },
+                { model: Book, as: 'bookreceiver' }
+            ]
+        });
+
+        for (const myTrade of myOtherTrades) {
+            myTrade.trade.status = 'rejected';
+            await myTrade.trade.save();
+
+            await Notification.create({
+                type: 'trade_update',
+                message: `Sua solicitação para trocar seu livro "${usertrade.booksender.title}" pelo livro "${myTrade.bookreceiver.title}" foi automaticamente cancelada porque você entrou em outra troca.`,
+                isRead: false,
+                receiver_id: myTrade.receiver_id,
+                sender_id: usertrade.sender_id
+            });
+        }
+
+        // 3. Cancela todas as trocas que foram feitas PARA o livro que eu ofereci (booksender_id)
+        const offersToMyBook = await Usertrade.findAll({
+            where: {
+                bookreceiver_id: usertrade.booksender_id,
+                id: { [Op.ne]: usertrade.id }
+            },
+            include: [
+                { model: Trade, as: 'trade', where: { status: 'pending' } },
+                { model: User, as: 'sender' }
+            ]
+        });
+
+        for (const offer of offersToMyBook) {
+            offer.trade.status = 'rejected';
+            await offer.trade.save();
+
+            await Notification.create({
+                type: 'trade_update',
+                message: `Sua solicitação de troca pelo livro "${usertrade.booksender.name}" foi automaticamente recusada porque o usuário está em outra trade.`,
+                isRead: false,
+                receiver_id: offer.sender_id,
+                sender_id: userId
+            });
+        }
+
+        // 4. Notifica o outro usuário da troca aceita
+        const notifiedUserId = (usertrade.sender_id === userId)
+            ? usertrade.receiver_id
+            : usertrade.sender_id;
+
+        const acceptedMessage = `${usertrade.sender.name} e ${usertrade.receiver.name} iniciaram uma troca entre "${usertrade.booksender.name}" e "${usertrade.bookreceiver.name}".`;
+
+        await Notification.create({
+            type: 'trade_update',
+            message: acceptedMessage,
+            isRead: false,
+            receiver_id: notifiedUserId,
+            sender_id: userId
+        });
+
+        return res.redirect('/trade/reqlist');
+
+    } catch (error) {
+        console.error('Erro ao aceitar troca:', error);
+        return res.status(500).send('Erro ao aceitar troca');
+    }
+};
+
+
+exports.rejectTrade = async (req, res) => {
+    const tradeId = req.params.id;
+    try {
+        const checkTrade = await Usertrade.findByPk(tradeId, {
+            include: [
+                { model: Book, as: 'bookreceiver' },
+                { model: Trade, as: 'trade', where: { status: 'pending' } },
                 { model: Book, as: 'booksender' },
                 { model: User, as: 'receiver' }, // Incluindo receiver
                 { model: User, as: 'sender' } // Incluindo sender
@@ -216,67 +362,198 @@ exports.acceptTrade = async (req, res) => {
         });
 
         if (!checkTrade || !checkTrade.trade) {
-            return res.status(404).send('Troca não encontrada ou já foi aceita');
+            return res.status(404).send('Troca não encontrada ou já foi rejeitada');
         }
 
-        // Altera o status da troca para "progress"
-        checkTrade.trade.status = 'progress';
+        // Altera o status da troca para "rejected"
+        checkTrade.trade.status = 'rejected';
         await checkTrade.trade.save();
 
-        // Atualiza o status dos livros
-        const bookReceiver = checkTrade.bookreceiver;
-        bookReceiver.status = 'unavailable';
-        await bookReceiver.save();
-
-        const bookSender = checkTrade.booksender;
-        bookSender.status = 'unavailable';
-        await bookSender.save();
-
-        // Obtém os IDs do sender e receiver
-        const senderId = checkTrade.sender_id;
-        const receiverId = checkTrade.receiver_id;
-
-        // Busca os nomes dos usuários
-        const sender = await User.findByPk(senderId);
-        const receiver = await User.findByPk(receiverId);
-
-        if (!sender || !receiver) {
-            return res.status(404).send('Usuário não encontrado');
-        }
-
-        // Notificação para o sender que a troca foi aceita
+        // Notificação para o sender que a troca foi rejeitada
         await Notification.create({
-            type: 'trade_update', // tipo de notificação diferente
-            message: `${receiver.name} aceitou sua solicitação de trade.`,
+            type: 'trade_update',
+            message: `${checkTrade.receiver.name} recusou sua solicitação de trade.`,
             isRead: false,
-            receiver_id: senderId, // Usuário que enviou a solicitação
-            sender_id: receiverId // Usuário que aceitou a solicitação
+            receiver_id: checkTrade.sender_id,
+            sender_id: checkTrade.receiver_id
         });
 
         res.redirect('/trade/reqlist');
     } catch (error) {
-        console.log(error);
-        console.error('Erro ao aceitar troca:', error);
-        res.status(500).send('Erro ao aceitar troca');
+        console.error('Erro ao rejeitar troca:', error);
+        res.status(500).send('Erro ao rejeitar troca');
     }
 };
-exports.rejectTrade = async (req, res) => {
+
+exports.confirmTrade = async (req, res) => {
     const tradeId = req.params.id;
+    const userId = req.session.userId;
+
     try {
         const checkTrade = await Usertrade.findByPk(tradeId, {
-            include: [{ model: Book, as: 'bookreceiver' },
-            { model: Trade, as: 'trade', where: { status: 'pending' } },
-            { model: Book, as: 'booksender' }]
-        })
-        if (!checkTrade) {
-            return res.status(404).send('Troca não encontrada')
-        }
-        checkTrade.trade.status = 'rejected';
-        await checkTrade.trade.save();
+            include: [
+                { model: Trade, as: 'trade' },
+                { model: User, as: 'receiver' },
+                { model: User, as: 'sender' },
+                { model: Book, as: 'bookreceiver' },
+                { model: Book, as: 'booksender' }
+            ]
+        });
 
-        res.redirect('/trade/reqlist')
+        if (
+            !checkTrade ||
+            !checkTrade.trade ||
+            !['progress', 'waiting'].includes(checkTrade.trade.status)
+        ) {
+            return res.status(404).send('Troca não encontrada ou já finalizada.');
+        }
+
+        // Verifica se o usuário é participante
+        if (userId !== checkTrade.sender_id && userId !== checkTrade.receiver_id) {
+            return res.status(403).send('Você não tem permissão para confirmar esta troca.');
+        }
+
+        // Verifica se o usuário já confirmou
+        const isSender = userId === checkTrade.sender_id;
+        const alreadyConfirmed = isSender
+            ? checkTrade.trade.confirmed_by_sender
+            : checkTrade.trade.confirmed_by_receiver;
+
+        if (alreadyConfirmed) {
+            req.flash('validationErrors', 'Você já confirmou esta troca. Aguarde o outro usuário.');
+            return res.redirect('/trade/mytrades');
+        }
+
+        // Atualiza o campo correto
+        if (isSender) {
+            checkTrade.trade.confirmed_by_sender = true;
+        } else {
+            checkTrade.trade.confirmed_by_receiver = true;
+        }
+
+        const bothConfirmed =
+            checkTrade.trade.confirmed_by_sender && checkTrade.trade.confirmed_by_receiver;
+
+        if (bothConfirmed) {
+            // Ambos confirmaram → completa a troca
+            checkTrade.trade.status = 'completed';
+
+            const bookSender = checkTrade.booksender;
+            const bookReceiver = checkTrade.bookreceiver;
+
+            bookSender.userId = checkTrade.receiver_id;
+            bookReceiver.userId = checkTrade.sender_id;
+            bookSender.status = 'available';
+            bookReceiver.status = 'available';
+
+            await bookSender.save();
+            await bookReceiver.save();
+
+            // Incrementa tradeCount dos dois usuários
+            const senderUser = await User.findByPk(checkTrade.sender_id);
+            const receiverUser = await User.findByPk(checkTrade.receiver_id);
+
+            if (senderUser && receiverUser) {
+                senderUser.tradeCount += 1;
+                receiverUser.tradeCount += 1;
+                await senderUser.save();
+                await receiverUser.save();
+            }
+
+            // Notificações
+            await Notification.create({
+                type: 'trade_completed',
+                message: `A troca foi concluída com sucesso!`,
+                isRead: false,
+                receiver_id: checkTrade.sender_id,
+                sender_id: checkTrade.receiver_id
+            });
+
+            await Notification.create({
+                type: 'trade_completed',
+                message: `A troca foi concluída com sucesso!`,
+                isRead: false,
+                receiver_id: checkTrade.receiver_id,
+                sender_id: checkTrade.sender_id
+            });
+
+            req.flash('validationErrors', 'Troca concluída com sucesso!');
+        } else {
+            // Só um confirmou ainda → status 'waiting'
+            checkTrade.trade.status = 'waiting';
+
+            const otherUserId = isSender ? checkTrade.receiver_id : checkTrade.sender_id;
+            const currentUser = await User.findByPk(userId);
+
+            await Notification.create({
+                type: 'trade_waiting',
+                message: `${currentUser.name} confirmou a troca. Aguardando o outro usuário.`,
+                isRead: false,
+                receiver_id: otherUserId,
+                sender_id: userId
+            });
+
+            req.flash('validationErrors', 'Confirmação registrada. Agora é necessário que o outro usuário também confirme.');
+        }
+
+        await checkTrade.trade.save();
+        res.redirect('/trade/mytrades');
     } catch (error) {
-        console.error('Erro ao rejeitar troca:', error)
-        res.status(500).send('Erro ao rejeitar troca')
+        console.error('Erro ao confirmar troca:', error);
+        res.status(500).send('Erro ao confirmar troca');
     }
 };
+
+exports.cancelTrade = async (req, res) => {
+    const tradeId = req.params.id;
+    const userId = req.session.userId;
+
+    try {
+        const checkTrade = await Usertrade.findByPk(tradeId, {
+            include: [
+                { model: Trade, as: 'trade', where: { status: 'progress' } },
+                { model: Book, as: 'bookreceiver' },
+                { model: Book, as: 'booksender' },
+                { model: User, as: 'receiver' },
+                { model: User, as: 'sender' }
+            ]
+        });
+
+        if (!checkTrade) {
+            return res.status(404).send('Troca não encontrada ou não pode ser cancelada');
+        }
+
+        // Verifica se o usuário logado é um dos participantes
+        if (checkTrade.sender_id !== userId && checkTrade.receiver_id !== userId) {
+            return res.status(403).send('Você não tem permissão para cancelar esta troca');
+        }
+
+        // Atualiza status da troca
+        checkTrade.trade.status = 'cancelled';
+        await checkTrade.trade.save();
+
+        // Libera os livros
+        checkTrade.bookreceiver.status = 'available';
+        await checkTrade.bookreceiver.save();
+
+        checkTrade.booksender.status = 'available';
+        await checkTrade.booksender.save();
+
+        // Notifica o outro usuário
+        const otherUserId = checkTrade.sender_id === userId ? checkTrade.receiver_id : checkTrade.sender_id;
+        const currentUser = await User.findByPk(userId);
+        await Notification.create({
+            type: 'trade_cancelled',
+            message: `A troca foi cancelada por ${currentUser.name}.`,
+            isRead: false,
+            receiver_id: otherUserId,
+            sender_id: userId
+        });
+
+        res.redirect('/trade/mytrades');
+    } catch (error) {
+        console.error('Erro ao cancelar troca:', error);
+        res.status(500).send('Erro ao cancelar troca');
+    }
+};
+

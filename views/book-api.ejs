@@ -1,41 +1,41 @@
 <% include header.ejs %>
 <% include font-control.ejs %>
-<div class="api-book-search-bar" style="text-align: left; margin-top:100px;">
-    <form action="/books/book-details" method="GET">
-        <input type="text" name="title" placeholder="Digite o título do livro..." class="api-book-search-input"
-            value="<%= title || '' %>" required>
-        <button type="submit" class="api-book-search-button">Buscar Livro</button>
+
+<div class="book-api-container">
+  <div class="book-api-search-bar">
+    <form action="/books/book-details" method="GET" class="book-api-search-form">
+      <input type="text" name="title" placeholder="Digite o título do livro..." class="book-api-input" value="<%= title || '' %>" required>
+      <button type="submit" class="book-api-button">Buscar Livro</button>
     </form>
-</div>
+  </div>
 
-<!-- Texto informativo -->
-<p class="api-book-prompt">Use esta ferramenta para encontrar informações detalhadas sobre o livro que você procura. Aqui, você pode descobrir dados essenciais, como o autor, a data de publicação, o número de páginas, a editora e muito mais.</p>
+  <p class="book-api-info-text">
+    Use esta ferramenta para encontrar informações detalhadas sobre o livro que você procura. Aqui, você pode descobrir dados essenciais, como o autor, a data de publicação, o número de páginas, a editora e muito mais.
+  </p>
 
-<!-- Seção de resultados -->
-<% if (books && books.length) { %>
-    <ul class="api-book-results-list">
-        <% books.forEach(function(book) { %>
-            <li class="api-book-card">
-                <a href="#" class="api-book-link">
-                    <div class="api-book-cover">
-                        <img src="<%= book.volumeInfo.imageLinks?.thumbnail || 'default.jpg' %>"
-                            alt="Capa de <%= book.volumeInfo.title %>">
-                    </div>
-                    <div class="api-book-info">
-                        <p class="api-book-title"><strong>Título:</strong> <%= book.volumeInfo.title %></p>
-                        <p class="api-book-authors"><strong>Autor:</strong> <%= book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Autor Desconhecido' %></p>
-                        <p class="api-book-pages"><strong>Páginas:</strong> <%= book.volumeInfo.pageCount || 'N/A' %></p>
-                        <p class="api-book-publisher"><strong>Editora:</strong> <%= book.volumeInfo.publisher || 'Desconhecida' %></p>
-                        <p class="api-book-published-date"><strong>Data de publicação:</strong> <%= book.volumeInfo.publishedDate || 'N/A' %></p>
-                        <!-- <p class="api-book-description"><strong>Descrição:</strong> <%= book.volumeInfo.description || 'Sem descrição disponível' %></p> -->
-                        <p class="api-book-categories"><strong>Categorias:</strong> <%= book.volumeInfo.categories ? book.volumeInfo.categories.join(', ') : 'Nenhuma categoria disponível' %></p>
-                    </div>
-                </a>
-            </li>
-        <% }); %>
+  <% if (books && books.length) { %>
+    <ul class="book-api-results">
+      <% books.forEach(function(book) { %>
+        <li class="book-api-card">
+          <a href="#" class="book-api-link">
+            <div class="book-api-cover">
+              <img src="<%= book.volumeInfo.imageLinks?.thumbnail || 'default.jpg' %>" alt="Capa de <%= book.volumeInfo.title %>">
+            </div>
+            <div class="book-api-details">
+              <p><strong>Título:</strong> <%= book.volumeInfo.title %></p>
+              <p><strong>Autor:</strong> <%= book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Autor Desconhecido' %></p>
+              <p><strong>Páginas:</strong> <%= book.volumeInfo.pageCount || 'N/A' %></p>
+              <p><strong>Editora:</strong> <%= book.volumeInfo.publisher || 'Desconhecida' %></p>
+              <p><strong>Data de publicação:</strong> <%= book.volumeInfo.publishedDate || 'N/A' %></p>
+              <p><strong>Categorias:</strong> <%= book.volumeInfo.categories ? book.volumeInfo.categories.join(', ') : 'Nenhuma categoria disponível' %></p>
+            </div>
+          </a>
+        </li>
+      <% }); %>
     </ul>
-<% } else if (title) { %>
-    <p>Nenhum livro encontrado com esse título.</p>
-<% } %>
+  <% } else if (title) { %>
+    <p class="book-api-not-found">Nenhum livro encontrado com esse título.</p>
+  <% } %>
+</div>
 
 <% include footer.ejs %>

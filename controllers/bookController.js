@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
 const Book = require('../models/book')
 const User = require('../models/user')
+const Title = require('../models/title');
 const Trade = require('../models/trade')
 const Notification = require('../models/notification')
 const Usertrade = require('../models/usertrade')
@@ -47,7 +48,6 @@ exports.addBook = async (req, res) => {
         res.redirect('/books/add');
     }
 };
-
 // Aprovar ou rejeitar um livro (apenas para o administrador)
 exports.approveBook = async (req, res) => {
     if (req.session.isAdmin) {
@@ -140,10 +140,10 @@ exports.pendingBooks = async (req, res) => {
 ;
 exports.getBooks = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Página atual, padrão é 1
-    const perPage = 10; // Número de itens por página
+    const perPage = 20; // Número de itens por página
     const offset = (page - 1) * perPage; // Cálculo do offset
     // Array de categorias
-    const categories = ['Educação', 'Ficção', 'Política'];
+    const categories = ['Educação', 'Ficção', 'Ação'];
     try {
         let books;
         const selectedCategory = req.query.category; // Categoria selecionada
@@ -328,5 +328,132 @@ exports.getBooksByTitle = async (req, res) => {
         res.status(500).send('Erro ao buscar livros.');
     }
 };
+
+
+exports.addTitleScreen = (req, res) => {
+    const authError = req.flash('authError')[0] || undefined;
+    const validationErrors = req.flash('validationErrors') || [];
+    const titleAdded = req.flash('added')[0] || undefined;
+
+    res.render('add-title', {  // renderize a view que você criou para adicionar título
+        authError,
+        validationErrors,
+        isAdmin: req.session.isAdmin,
+        titleAdded,
+        pageTitle: "Adicionar Título",
+        req
+    });
+};
+
+exports.addTitleScreen = (req, res) => {
+    const authError = req.flash('authError')[0] || undefined;
+    const validationErrors = req.flash('validationErrors') || [];
+    const titleAdded = req.flash('added')[0] || undefined;
+
+    res.render('add-title', {
+        authError,
+        validationErrors,
+        isUser: true,
+        isAdmin: req.session.isAdmin,
+        titleAdded,
+        req,
+        pageTitle: "Adicionar Título"
+    });
+};
+
+exports.addTitle = async (req, res) => {
+    if (validationResult(req).isEmpty()) {
+        try {
+            await Title.create({
+                name: req.body.name,
+                description: req.body.description,
+                author: req.body.author,
+                image: req.file.filename,  // Aqui pega o arquivo enviado pelo multer
+            });
+            req.flash('added', true);
+            res.redirect('/books/titles/add');
+        } catch (err) {
+            return res.status(400).json({ error: 'Erro: ' + err.message });
+        }
+    } else {
+        req.flash('validationErrors', validationResult(req).array());
+        res.redirect('/books/titles/add');
+    }
+};
+
+
+exports.getTitles = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 10;
+    const offset = (page - 1) * perPage;
+    const searchQuery = req.query.search;
+
+    const whereClause = {};
+
+    if (searchQuery) {
+        whereClause.name = {
+            [Sequelize.Op.like]: `%${searchQuery}%`
+        };
+    }
+
+    try {
+        const { count, rows: titles } = await Title.findAndCountAll({
+            where: whereClause,
+            limit: perPage,
+            offset: offset,
+            order: [['name', 'ASC']]
+        });
+
+        const totalPages = Math.ceil(count / perPage);
+
+        res.render('list-titles', {
+            titles,
+            pageTitle: 'Lista de Títulos',
+            isUser: req.session.userId,
+            req,
+            currentPage: page,
+            totalPages,
+            searchQuery
+        });
+    } catch (err) {
+        console.error('Erro ao buscar títulos' + err);
+        res.status(500).send('Erro ao buscar títulos');
+    }
+};
+
+exports.getTitleById = async (req, res) => {
+  try {
+    const titleId = req.params.id;
+
+    // Buscar título/resenha pelo ID
+    const title = await Title.findByPk(titleId);
+
+    if (!title) {
+      return res.status(404).render('error', {
+        message: 'Resenha não encontrada',
+        req,
+        error: { status: 404 }
+      });
+    }
+
+    // Renderizar a view de detalhe da resenha (você cria essa view, ex: title-detail.ejs)
+    res.render('title-details', {
+      title,
+      pageTitle: title.name,
+      isUser: !!req.session.userId,
+      isAdmin: req.session.isAdmin,
+      req
+    });
+
+  } catch (error) {
+    console.error('Erro ao buscar a resenha:', error);
+    res.status(500).send('Erro ao buscar a resenha');
+  }
+};
+
+
+
+
+
 
 

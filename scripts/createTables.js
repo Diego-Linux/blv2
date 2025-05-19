@@ -1,6 +1,9 @@
 require('dotenv').config();
 const database = require('../models/connection');
+
+// Importação dos models
 const User = require('../models/user');
+const Title = require('../models/title');
 const Book = require('../models/book');
 const Trade = require('../models/trade');
 const UserTrade = require('../models/usertrade');
@@ -8,12 +11,15 @@ const Notification = require('../models/notification');
 
 async function syncModels() {
     try {
-        // Testa a conexão
         await database.authenticate();
         console.log('Conexão com o banco de dados estabelecida.');
-        // Sincroniza os models na ordem correta
+
+        // Ordem correta para sincronização, respeitando dependências
         await User.sync({ force: true });
         console.log('Tabela User criada.');
+
+        await Title.sync({ force: true });
+        console.log('Tabela Title criada.');
 
         await Book.sync({ force: true });
         console.log('Tabela Book criada.');
@@ -31,10 +37,9 @@ async function syncModels() {
     } catch (error) {
         console.error('Erro ao sincronizar os models:', error);
     } finally {
-        // Encerra a conexão com o banco de dados após a sincronização
         await database.close();
         console.log('Conexão com o banco de dados encerrada.');
     }
 }
-// Executa a função de sincronização
+
 syncModels();

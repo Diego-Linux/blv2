@@ -53,15 +53,15 @@ exports.loadNotifications = async (req, res, next) => {
 
 exports.markAsRead = async (req, res) => {
     try {
-        const notificationId = req.params.id; // ID da notificação a ser marcada como lida
-        
-        // Atualizar a notificação para marcada como lida
+        const notificationId = req.params.id;
+        const { redirectTo } = req.body;
+
         await Notification.update(
             { isRead: true },
             { where: { id: notificationId, receiver_id: req.session.userId } }
         );
-        // Enviar resposta de sucesso
-        res.redirect('/trade/reqlist')
+
+        res.redirect(redirectTo || '/'); // Redireciona para onde veio da notificação
     } catch (error) {
         console.error('Erro ao marcar notificação como lida:', error);
         res.status(500).json({ message: 'Erro ao marcar notificação como lida.' });

@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize');
 const database = require('./connection');
-const path = require('path')
 
-const User = database.define('user', {
+const Title = database.define('title', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -13,28 +12,20 @@ const User = database.define('user', {
         type: Sequelize.STRING,
         allowNull: false
     },
+    description: {
+        type: Sequelize.TEXT,
+        allowNull: false
+    },
     image: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    email: {
+    author: {
         type: Sequelize.STRING,
         allowNull: false
-    },
-    tradeCount: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-    },
-    isAdmin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-    },
-    password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-    },
+    }
 });
 
-// database.sync({alter:true})
+// database.sync({ alter: true });
 
-module.exports = User;
+module.exports = Title;

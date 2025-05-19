@@ -5,70 +5,135 @@ const Book = require('../models/book');
 async function addBooks() {
     const books = [
         {
+            name: "Tropa de Elite [ELITE DA TROPA]",
+            category: "Ação",
+            author: "André Batista, Rodrigo Pimentel e Luiz Eduardo Soares",
+            image: "elitedatropa.jpg",
+            description: "Um retrato brutal e realista da Tropa de Elite do BOPE, abordando o combate ao crime organizado no Rio de Janeiro, a corrupção e os dilemas éticos enfrentados pelos policiais.",
+            userId: 3,
+        },
+        {
+            name: "O Poderoso Chefão",
+            category: "Ação",
+            author: "Mario Puzo",
+            image: "opoderosochefao.jpg",
+            description: "Um épico da máfia que narra a ascensão da família Corleone, seus códigos de honra, vingança e o jogo de poder nos bastidores do crime organizado nos Estados Unidos.",
+            userId: 4,
+        },
+        {
+            name: "A Arte da Guerra",
+            category: "Ação",
+            author: "Sun Tzu",
+            image: "suntzu.jpg",
+            description: "Manual estratégico milenar usado por generais, empresários e líderes. Ensina como vencer batalhas sem conflito direto e dominar situações com sabedoria e cálculo.",
+            userId: 2,
+        },
+        {
+            name: "Sniper Americano",
+            category: "Ação",
+            author: "Chris Kyle",
+            image: "sniperamericano.jpg",
+            description: "Autobiografia do atirador mais letal da história militar dos EUA. Um retrato cru e intenso das guerras no Iraque e Afeganistão, e os dilemas de um guerreiro.",
+            userId: 7,
+        },
+        {
             name: "Inteligência do Carisma",
             category: "Educação",
             author: "Heni Ozi Cukier",
-            image: 'inteligenciadocarisma.jpg',
-            description: "Aprenda a conquistar, cativar, motivar e ser querido e respeitado Você sabia que o carisma não é um dom ou um favor divino, como acreditavam os gregos? Apesar de ter sido usado para descrever os “dons carismáticos” do Espírito Santo, a ciência contemporânea prova que este poder de atrair e influenciar é, na verdade, aprendido e pode ser desenvolvido por qualquer pessoa. Neste livro, o cientista político Heni Ozi Cukier faz um retrato fascinante sobre a história do carisma: desde os nossos antepassados que seguiam o líder nas caçadas (e nem sempre o líder era o mais forte fisicamente), passando pela Grécia Antiga, o Império Romano, as cartas de São Paulo durante a expansão da Igreja Católica, o Renascimento até os dias de hoje. Ao se voltar para a evolução do mundo, Cukier mostra como ter carisma é fundamental nas relações de poder, mas também é instrumento facilitador para o sucesso na vida pessoal e profissional. A partir do desenvolvimento da inteligência emocional, social e contextual, qualquer pessoa pode se tornar carismática. Tudo depende de treinar habilidades e competências, segundo ensina o autor. No nível pessoal, por exemplo, significa conhecer a si mesmo, saber gerir emoções e instintos e definir propósitos de vida. Já no nível social, é preciso treinar ferramentas de comunicação e dominar técnicas de influência e persuasão. E, no nível contextual, ter foco, visão estratégica e curiosidade para se adaptar aos diferentes meios, culturas e padrões de comportamento. O desenvolvimento e o treino dessas inteligências vão proporcionar brilho, presença e visão – o que toda pessoa com poder de carisma tem.",
-            userId: 2
-        },
-        {
-            name: "Hábitos Atômicos",
-            category: "Educação",
-            author: "James Clear",
-            image: 'habitosatomicos.jpg',
-            description: "Não importa quais sejam seus objetivos, Hábitos Atômicos oferece um método eficaz... [descrição completa]",
-            userId: 3
+            image: "inteligenciadocarisma.jpg",
+            description: "Aprenda a conquistar, cativar e influenciar pessoas com técnicas de persuasão, linguagem corporal e inteligência emocional. Essencial para líderes e comunicadores.",
+            userId: 2,
         },
         {
             name: "Matemática para Concursos",
             category: "Educação",
             author: "Lillian Rose Cerchiareto Quilelli Correa",
             image: "matematica.jpg",
-            description: "Este livro é ideal para concurseiros que têm dificuldade de estudar e memorizar uma série de regras matemáticas, mas que precisam estar verdadeiramente preparados para o enfrentamento das provas de concurso. Alia a melhor abordagem da teoria exigida pelas bancas com exercícios e questões de prova para praticar e fixar os conteúdos estudados. Contém: exercícios de aplicação: para a prática imediata dos assuntos abordados, assegurando rápida assimilação destes; exercícios resolvidos: questões de concurso para ajudar a entender como resolvê-las sem complicações e a identificar as características das provas; exercícios propostos: questões de prova, mas com gabarito, para treinar ainda mais; notas: curiosidades matemáticas e destaques a pontos importantes que chamam a atenção e facilitam o entendimento. Em linguagem esclarecedora e didática, o autor apresenta diversos macetes que ajudam a aprender Matemática, garantindo aos leitores a melhor preparação.",
-            userId: 4
+            description: "Didático e completo, este livro é ideal para concurseiros que precisam dominar a matemática básica e intermediária, com foco em provas e exercícios comentados.",
+            userId: 4,
         },
         {
-            name: "Pequeno Príncipe",
+            name: "Israel x Palestina: 100 Anos de Guerra",
+            category: "Educação",
+            author: "James L. Gelvin",
+            image: "israelxpalestina.jpg",
+            description: "Este livro oferece uma análise clara, concisa e imparcial do longo e complexo conflito entre israelenses e palestinos. Com foco histórico e político, James L. Gelvin traça os principais eventos desde o final do Império Otomano até os dias atuais, contextualizando as raízes do embate, os interesses geopolíticos e as tentativas de paz. Uma leitura essencial para quem deseja entender a dinâmica do Oriente Médio e os desdobramentos do conflito mais persistente da atualidade.",
+            userId: 3,
+        },
+        {
+            name: "Sapiens: Uma Breve História da Humanidade",
+            category: "Educação",
+            author: "Yuval Noah Harari",
+            image: "sapiens.jpg",
+            description: "Uma jornada fascinante pela história do Homo sapiens, analisando como cultura, economia e política moldaram o mundo moderno.",
+            userId: 1,
+        },
+        {
+            name: "Como Mentir com Estatística",
+            category: "Educação",
+            author: "Darrell Huff",
+            image: "comomentircomestatistica.jpg",
+            description: "Um clássico sobre como estatísticas podem ser manipuladas para enganar. Essencial para quem quer desenvolver pensamento crítico diante de números.",
+            userId: 2,
+        },
+        {
+            name: "Guerra Irregular: Terrorismo, Guerrilha e Movimentos de Resistência ao Longo da História",
+            category: "Educação",
+            author: "Colin S. Gray",
+            image: "guirregular.jpg",
+            description: "Uma análise precisa e profunda sobre conflitos assimétricos, com foco em táticas e impactos geopolíticos de guerras não convencionais.",
+            userId: 6,
+        },
+        {
+            name: "O Príncipe",
+            category: "Educação",
+            author: "Maquiavel",
+            image: "oprincipemaquiavel.jpg",
+            description: "Um dos livros políticos mais importantes da história, que analisa o poder, a liderança e a arte de governar de forma realista e estratégica.",
+            userId: 6,
+        },
+        {
+            name: "Batman: Ano Um",
             category: "Ficção",
-            author: "Antoine de Saint-Exupéry",
-            image: "pequenoprincipe.jpg",
-            description:"Nesta história que marcou gerações de leitores em todo o mundo, um piloto cai com seu avião no deserto do Saara e encontra um pequeno príncipe, que o leva a uma aventura filosófica e poética através de planetas que encerram a solidão humana.",
-            userId: 5
+            author: "Frank Miller",
+            image: "batmananoum.jpg",
+            description: "Considerada uma das histórias definitivas do Cavaleiro das Trevas, 'Ano Um' reconta as origens do Batman em Gotham City. Escrita por Frank Miller, esta graphic novel apresenta um Bruce Wayne mais humano e sombrio, enquanto o comissário Gordon enfrenta a corrupção policial. Uma narrativa intensa e cinematográfica.",
+            userId: 6,
         },
         {
-            name: "Batman",
+            name: "God of war (vol. 1)",
             category: "Ficção",
-            author: "Rafael Grampá",
-            image: "batman.jpg",
-            description: "Um assassino em série está à solta, e, embora as vítimas de assassinato pareçam aleatórias no início, cada pista aproxima o Batman da terrível verdade: que todos estão conectados, não apenas uns aos outros… mas a ele também. Em uma Gotham City onde cada dia parece mais sombrio e irremediável do que o anterior, Batman faz uma escolha definitiva: matar a identidade de Bruce Wayne para sempre e abraçar o capuz em tempo integral. Mas, embora conheça as ruas de Gotham, ele logo descobrirá que mal conhece a si mesmo.",
-            userId: 6
+            author: "Matthew Stover",
+            image: "gow.jpg",
+            description: "Kratos é um guerreiro grego a serviço dos deuses Gregos do Olimpo. Enganado por Ares, o Deus da Guerra, que queria transformá-lo num guerreiro perfeito, Kratos acidentalmente mata sua esposa e sua filha, mas, depois disso, Kratos decide não servir mais a Ares e é amaldiçoado com as cinzas de sua família morta pelo Oráculo da cidade que foi destruída. Kratos é atormentado com memórias de seus atos e faz um trato de servir aos outros deuses do Olimpo por dez anos. Cansado de servir, convoca Atena e, ela afirma que o perdoará por seus atos se ele realizar uma última tarefa: matar Ares. Para isso ele deve encontrar e usar a Caixa de Pandora.",
+            userId: 4,
         },
         {
-            name: "Política Brasileira",
-            category: "Política",
-            author: "Alessandro Nicoli de Mattos",
-            image: "politicabrasileira.jpg",
-            description: "O Livro Urgente da Política Brasileira é um guia para o cidadão entender a política, o governo e o Estado no Brasil. Numa revisão bibliográfica inédita, o livro aborda questões práticas e temas correntes do discurso político atual, mas sem entrar em aspectos filosóficos ou assuntos polêmicos. O objetivo deste livro é fornecer ao leitor de forma clara e objetiva as informações básicas necessárias para a formação de um \"alfabetismo político\", uma base sobre a qual todos nós poderemos construir nossa consciência política, que é fundamental para que a sociedade engaje em discussões sérias e produtivas que irão, ultimamente, viabilizar um país mais próspero e justo para as gerações futuras.",
-            userId: 7
-        },
+            name: "Admirável Mundo Novo",
+            category: "Ficção",
+            author: "Aldous Huxley",
+            image: "admiravelmundonovo.jpg",
+            description: "Neste clássico distópico, a humanidade vive sob um regime de controle social baseado em prazer, consumo e engenharia genética. A obra antecipa debates sobre liberdade, tecnologia e identidade, com uma crítica afiada à sociedade moderna.",
+            userId: 2,
+        }
     ];
+
 
     try {
         // Testa a conexão
         await database.authenticate();
-        console.log('Conexão com o banco de dados estabelecida.');
+        console.log('✅ Conexão com o banco de dados estabelecida.');
+
         // Adiciona os livros
         for (const book of books) {
             await Book.create(book);
-            console.log(`Livro "${book.name}" adicionado com sucesso.`);
+            console.log(`📚 Livro "${book.name}" adicionado com sucesso.`);
         }
     } catch (error) {
-        console.error('Erro ao adicionar livros:', error);
+        console.error('❌ Erro ao adicionar livros:', error);
     } finally {
-        // Encerra a conexão com o banco de dados
         await database.close();
-        console.log('Conexão com o banco de dados encerrada.');
+        console.log('🔒 Conexão com o banco de dados encerrada.');
     }
 }
 
