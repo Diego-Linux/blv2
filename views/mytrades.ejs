@@ -21,12 +21,17 @@
             trade.trade.status === 'completed' ? 'completed' : 'active' %>">
 
         <div class="card-mytrade-card-content">
-            <p><strong>Solicitado por:</strong>
-                <%= trade.sender.id === req.session.userId ? 'Você' : trade.sender.name %>
-            </p>
-            <p><strong>Para:</strong>
-                <%= trade.receiver.name %>
-            </p>
+          <p><strong>Solicitado por:</strong>
+  <a href="/user/<%= trade.sender.id %>">
+    <%= trade.sender.id === req.session.userId ? 'Você' : trade.sender.name %>
+  </a>
+</p>
+<p><strong>Para:</strong>
+  <a href="/user/<%= trade.receiver.id %>">
+    <%= trade.receiver.name %>
+  </a>
+</p>
+
             <p><strong>Livro oferecido:</strong> 
                 <a href="/books/<%= trade.booksender_id %>" class="card-mytrade-link">
                     <%= trade.booksender.name %>
@@ -58,8 +63,8 @@
             </div>
         </div>
         <div class="card-mytrade-images">
-            <img src="/<%= trade.booksender.image %>" alt="Imagem de <%= trade.booksender.name %>" class="card-mytrade-image" />
-            <img src="/<%= trade.bookreceiver.image %>" alt="Imagem de <%= trade.bookreceiver.name %>" class="card-mytrade-image" />
+            <img src="<%= trade.booksender.image %>" alt="Imagem de <%= trade.booksender.name %>" class="card-mytrade-image" />
+            <img src="<%= trade.bookreceiver.image %>" alt="Imagem de <%= trade.bookreceiver.name %>" class="card-mytrade-image" />
         </div>
     </div>
 

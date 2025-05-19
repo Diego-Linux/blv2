@@ -34,7 +34,7 @@ exports.addBook = async (req, res) => {
                 description: req.body.description,
                 category: req.body.category,
                 author: req.body.author,
-                image: req.body.image = req.file.filename,
+                image: req.file.path,
                 userId: req.session.userId,
                 approvalStatus: 'pending' // Status de aprovação pendente por padrão
             });
@@ -422,33 +422,33 @@ exports.getTitles = async (req, res) => {
 };
 
 exports.getTitleById = async (req, res) => {
-  try {
-    const titleId = req.params.id;
+    try {
+        const titleId = req.params.id;
 
-    // Buscar título/resenha pelo ID
-    const title = await Title.findByPk(titleId);
+        // Buscar título/resenha pelo ID
+        const title = await Title.findByPk(titleId);
 
-    if (!title) {
-      return res.status(404).render('error', {
-        message: 'Resenha não encontrada',
-        req,
-        error: { status: 404 }
-      });
+        if (!title) {
+            return res.status(404).render('error', {
+                message: 'Resenha não encontrada',
+                req,
+                error: { status: 404 }
+            });
+        }
+
+        // Renderizar a view de detalhe da resenha (você cria essa view, ex: title-detail.ejs)
+        res.render('title-details', {
+            title,
+            pageTitle: title.name,
+            isUser: !!req.session.userId,
+            isAdmin: req.session.isAdmin,
+            req
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar a resenha:', error);
+        res.status(500).send('Erro ao buscar a resenha');
     }
-
-    // Renderizar a view de detalhe da resenha (você cria essa view, ex: title-detail.ejs)
-    res.render('title-details', {
-      title,
-      pageTitle: title.name,
-      isUser: !!req.session.userId,
-      isAdmin: req.session.isAdmin,
-      req
-    });
-
-  } catch (error) {
-    console.error('Erro ao buscar a resenha:', error);
-    res.status(500).send('Erro ao buscar a resenha');
-  }
 };
 
 

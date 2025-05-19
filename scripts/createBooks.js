@@ -1,9 +1,29 @@
 require('dotenv').config();
+const path = require('path');
+const cloudinary = require('cloudinary').v2;
 const database = require('../models/connection');
 const Book = require('../models/book');
 
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
+});
+
+async function uploadToCloudinary(localFilePath) {
+    try {
+        const result = await cloudinary.uploader.upload(localFilePath, {
+            folder: 'uploads',
+        });
+        return result.secure_url;
+    } catch (err) {
+        console.error('Erro ao fazer upload para o Cloudinary:', err.message);
+        return null;
+    }
+}
+
 async function addBooks() {
-    const books = [
+         const books = [
         {
             name: "Tropa de Elite [ELITE DA TROPA]",
             category: "Ação",
@@ -118,16 +138,25 @@ async function addBooks() {
         }
     ];
 
-
     try {
-        // Testa a conexão
         await database.authenticate();
         console.log('✅ Conexão com o banco de dados estabelecida.');
 
-        // Adiciona os livros
         for (const book of books) {
-            await Book.create(book);
-            console.log(`📚 Livro "${book.name}" adicionado com sucesso.`);
+            const imagePath = path.join(__dirname, '../images/', book.image);
+            const imageUrl = await uploadToCloudinary(imagePath);
+
+            if (!imageUrl) {
+                console.log(`❌ Falha ao enviar imagem de "${book.name}". Pulando...`);
+                continue;
+            }
+
+            await Book.create({
+                ...book,
+                image: imageUrl
+            });
+
+            console.log(`📚 Livro "${book.name}" adicionado com imagem.`);
         }
     } catch (error) {
         console.error('❌ Erro ao adicionar livros:', error);

@@ -28,7 +28,7 @@
                 <% trades.forEach(trade=> { %>
                   <div class="solicitacoes-card">
                     <div class="solicitacoes-topo">
-                      <img src="/<%= trade.sender.image %>" alt="Imagem do usuário" class="solicitacoes-img" />
+                      <img src="<%= trade.sender.image %>" alt="Imagem do usuário" class="solicitacoes-img" />
                       <a href="/user/<%=trade.sender.id%>" class="trader-name">
                         <%= trade.sender.name %>
                       </a>
@@ -39,13 +39,13 @@
                       <div class="solicitacoes-livros">
                         <div class="livro-item">
                           <a href="/books/<%= trade.booksender.id %>">
-                            <img src="/<%= trade.booksender.image %>" alt="Livro oferecido" class="livro-img">
+                            <img src="<%= trade.booksender.image %>" alt="Livro oferecido" class="livro-img">
                             <span>Livro oferecido: <%= trade.booksender.name %></span>
                           </a>
                         </div>
                         <div class="livro-item">
                           <a href="/books/<%= trade.bookreceiver.id %>">
-                            <img src="/<%= trade.bookreceiver.image %>" alt="Livro requisitado" class="livro-img">
+                            <img src="<%= trade.bookreceiver.image %>" alt="Livro requisitado" class="livro-img">
                             <span>Livro requisitado: <%= trade.bookreceiver.name %></span>
                           </a>
                         </div>

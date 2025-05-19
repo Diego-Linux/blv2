@@ -16,5 +16,8 @@ router.post('/cancel/:id', Middleware.isUser, TradeCtrl.cancelTrade);
 
 router.post('/confirm/:id', Middleware.isUser, TradeCtrl.confirmTrade);
 
+router.get('/myrequests', Middleware.isUser, TradeCtrl.myRequests);
+
+router.post('/cancel-request/:id', Middleware.isUser, TradeCtrl.cancelRequest);
 
 module.exports = router

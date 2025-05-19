@@ -44,7 +44,7 @@
             <% for (let book of books) { %>
                 <div class="card" onclick="window.location.href = '/books/<%= book.id %>'">
                     <% if (book.image && book.image.length > 0) { %>
-                        <img src="/<%= book.image %>" alt="Imagem de <%= book.name %>">
+                        <img src="<%= book.image %>" alt="Imagem de <%= book.name %>">
                     <% } else { %>
                         <img src="/default-book.jpg" alt="Imagem padrão">
                     <% } %>

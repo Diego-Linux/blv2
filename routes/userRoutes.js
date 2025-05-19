@@ -2,6 +2,8 @@ const router = require('express').Router()
 const userCtrl = require('../controllers/userController')
 const Middleware = require('../middlewares/middleware')
 const multer = require('multer');
+const { storage } = require('../config/cloudinary'); // usa o Cloudinary
+const upload = multer({ storage });
 
 // Middleware para carregar notificações
 router.use(userCtrl.loadNotifications);
@@ -24,16 +26,7 @@ router.get('/mybooks', Middleware.isUser, userCtrl.getBooksUser)
 
 router.get('/edit-profile', Middleware.isUser, userCtrl.getEditUser)
 
-router.post('/update-profile',  multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, "images/");
-        },
-        filename: (req, file, cb) => {
-            cb(null, Date.now() + "-" + file.originalname);
-        }
-    })
-}).single("image"), Middleware.isUser, userCtrl.updateProfile);
+router.post('/update-profile', Middleware.isUser, upload.single('image'), userCtrl.updateProfile);
 
 router.get('/user/:id', Middleware.isUser, userCtrl.getUserProfileById)
 

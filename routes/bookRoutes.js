@@ -3,17 +3,10 @@ const bookCtrl = require('../controllers/bookController');
 const userMiddleware = require('../middlewares/middleware');
 const multer = require('multer');
 const { check } = require('express-validator');
+const { storage } = require('../config/cloudinary'); // importa o storage do Cloudinary
 
-const upload = multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, "images/");
-        },
-        filename: (req, file, cb) => {
-            cb(null, Date.now() + "-" + file.originalname);
-        }
-    })
-});
+const upload = multer({ storage });
+
 // Rotas fixas (sem parâmetro dinâmico) devem vir primeiro:
 router.get('/', userMiddleware.isUser, bookCtrl.getBooks);
 
@@ -21,7 +14,7 @@ router.get('/add', userMiddleware.isUser, bookCtrl.addBookScreen);
 
 router.post('/add',
     userMiddleware.isUser,
-    upload.single("image"),
+    upload.single("image"), // agora usa upload no Cloudinary
     check("name").not().isEmpty().withMessage("Nome é obrigatório !"),
     check("description").not().isEmpty().withMessage("Descrição é obrigatório !"),
     check("category").not().isEmpty().withMessage("Defina uma categoria !"),
@@ -37,8 +30,8 @@ router.get('/titles', userMiddleware.isUser, bookCtrl.getTitles);
 router.get('/titles/add', userMiddleware.isAdmin, bookCtrl.addTitleScreen);
 
 router.post('/titles/add',
-    userMiddleware.isAdmin, // Somente admins podem adicionar títulos
-    upload.single("image"), // Middleware do multer (mesmo que usado em /add)
+    userMiddleware.isAdmin,
+    upload.single("image"), // Cloudinary upload
     check("name").not().isEmpty().withMessage("Nome é obrigatório!"),
     check("description").not().isEmpty().withMessage("Descrição é obrigatória!"),
     check("author").not().isEmpty().withMessage("Autor é obrigatório!"),
@@ -48,7 +41,8 @@ router.post('/titles/add',
     }),
     bookCtrl.addTitle
 );
-router.get('/titles/:id', userMiddleware.isUser,bookCtrl.getTitleById);
+
+router.get('/titles/:id', userMiddleware.isUser, bookCtrl.getTitleById);
 
 router.get('/book-details', userMiddleware.isUser, bookCtrl.getBooksByTitle);
 

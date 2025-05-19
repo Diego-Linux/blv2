@@ -20,7 +20,7 @@
     <div class="user-profile">
         <div class="user-image">
             <% if (user.image) { %>
-                <img src="/<%= user.image %>" alt="Foto de <%= user.name %>">
+                <img src="<%= user.image %>" alt="Foto de <%= user.name %>">
             <% } else { %>
                 <p>Imagem não disponível</p>
             <% } %>
@@ -58,7 +58,7 @@
                 <% books.forEach(function(book) { %>
                     <div class="card" onclick="window.location.href = '/books/<%= book.id %>'">
                         <% if (book.image && book.image.length > 0) { %>
-                            <img src="/<%= book.image %>" alt="Imagem de <%= book.name %>">
+                            <img src="<%= book.image %>" alt="Imagem de <%= book.name %>">
                         <% } else { %>
                             <img src="/default-book.jpg" alt="Imagem padrão">
                         <% } %>

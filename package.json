@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-     "test": "jest",
+    "test": "jest",
     "start": "nodemon server.js"
   },
   "keywords": [],
@@ -14,6 +14,7 @@
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
     "connect-flash": "^0.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -23,6 +24,7 @@
     "express-validator": "^7.0.1",
     "expressjs": "^1.0.1",
     "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.9.6",
     "node-mocks-http": "^1.16.1",
     "nodemon": "^3.1.0",

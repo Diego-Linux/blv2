@@ -77,6 +77,97 @@ exports.requestTrade = async (req, res) => {
     }
 };
 
+exports.cancelRequest = async (req, res) => {
+    const tradeId = req.params.id;
+    const userId = req.session.userId;
+
+    try {
+        const userTrade = await Usertrade.findByPk(tradeId, {
+            include: [
+                { model: Trade, as: 'trade', where: { status: 'pending' } }
+            ]
+        });
+
+        if (!userTrade || !userTrade.trade) {
+            req.flash('validationErrors', 'Solicitação já foi cancelada ou processada.');
+            return res.redirect('/trade/mytrades');
+        }
+
+        if (userTrade.sender_id !== userId) {
+            return res.status(403).send('Você não tem permissão para cancelar esta solicitação.');
+        }
+
+        userTrade.trade.status = 'rejected';
+        await userTrade.trade.save();
+
+        await Notification.create({
+            type: 'trade_update',
+            message: `O usuário cancelou a solicitação de troca.`,
+            isRead: false,
+            receiver_id: userTrade.receiver_id,
+            sender_id: userId
+        });
+
+        req.flash('validationErrors', 'Solicitação cancelada com sucesso.');
+        res.redirect('/trade/mytrades');
+    } catch (error) {
+        console.error('Erro ao cancelar solicitação:', error);
+        res.status(500).send('Erro ao cancelar solicitação');
+    }
+};
+
+exports.myRequests = async (req, res) => {
+    const userId = req.session.userId;
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 10;
+    const offset = (page - 1) * perPage;
+
+    try {
+        const trades = await Usertrade.findAll({
+            where: { sender_id: userId },
+            include: [
+                {
+                    model: Trade,
+                    as: 'trade',
+                    where: { status: 'pending' },
+                },
+                {
+                    model: Book,
+                    as: 'bookreceiver',
+                    attributes: ['id', 'name', 'image']
+                },
+                {
+                    model: Book,
+                    as: 'booksender',
+                    attributes: ['id', 'name', 'image']
+                },
+                {
+                    model: User,
+                    as: 'receiver',
+                    attributes: ['id', 'name', 'image']
+                }
+            ],
+            limit: perPage,
+            offset: offset,
+        });
+
+        const totalCount = await Usertrade.count({ where: { sender_id: userId } });
+        const totalPages = Math.ceil(totalCount / perPage);
+
+        res.render('myrequests', {
+            validationErrors: req.flash('validationErrors'),
+            trades: trades,
+            req: req,
+            currentPage: page,
+            totalPages: totalPages,
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Erro ao buscar suas solicitações');
+    }
+};
+
 exports.myTrades = async (req, res) => {
     const userId = req.session.userId;
     const page = parseInt(req.query.page) || 1;
