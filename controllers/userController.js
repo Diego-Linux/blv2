@@ -216,6 +216,7 @@ exports.userLogin = async (req, res) => {
         }
         req.session.userId = user.id;
         req.session.isAdmin = user.isAdmin;
+          req.session.image = user.image;
         if (req.session.isAdmin) {
             await Book.findAll();
             const totalCount = await Book.count({ where: { status: 'pending' } });

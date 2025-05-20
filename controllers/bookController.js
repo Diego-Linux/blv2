@@ -193,66 +193,85 @@ exports.getBooks = async (req, res) => {
 exports.getBookById = async (req, res, next) => {
     try {
         const bookId = req.params.id;
-        const userId = req.session.userId; // ID do usuário logado
-        const isAdmin = req.session.isAdmin; // Verifica se o usuário é um administrador
+        const userId = req.session.userId;
+        const isAdmin = req.session.isAdmin;
 
-        // Busca o livro pelo ID com inclusão do modelo User
         const book = await Book.findByPk(bookId, { include: User });
 
-        // Verifica se o usuário está envolvido em trocas relacionadas ao livro como remetente ou destinatário
-        const relatedTrades = await Usertrade.findAll({
-            where: {
-                [Sequelize.Op.or]: [
-                    { booksender_id: bookId },
-                    { bookreceiver_id: bookId }
-                ],
-                [Sequelize.Op.and]: [
-                    Sequelize.literal(`(sender_id = ${userId} OR receiver_id = ${userId})`)
-                ]
-            }
+        if (!book) {
+            req.flash("validationErrors", "Livro não encontrado.");
+            return res.redirect("/livros");
+        }
+
+        const myBooks = await Book.findAll({
+            where: { userId: userId, status: 'available' }
         });
-        // Se o usuário está envolvido em trocas relacionadas, renderiza os detalhes do livro
-        if (relatedTrades.length > 0) {
-            const senderBookId = relatedTrades[0].booksender_id;
-            const receiverBookId = relatedTrades[0].bookreceiver_id;
 
-            // Busca os livros do sender e do receiver na troca
-            const senderBook = await Book.findByPk(senderBookId, { include: User });
-            const receiverBook = await Book.findByPk(receiverBookId, { include: User });
-
-            res.render("book-details", {
-                book: book,
-                senderBook: senderBook,
-                receiverBook: receiverBook,
-                isUser: req.session.userId,
-                isAdmin: req.session.isAdmin,
-                req: req,
-                pageTitle: book.name
+        if (book.userId !== userId) {
+            const relatedTrades = await Usertrade.findAll({
+                where: {
+                    [Sequelize.Op.or]: [
+                        { booksender_id: bookId },
+                        { bookreceiver_id: bookId }
+                    ],
+                    [Sequelize.Op.and]: [
+                        Sequelize.literal(`(sender_id = ${userId} OR receiver_id = ${userId})`)
+                    ]
+                }
             });
-        } else {
-            // Verifica se o livro está disponível e aprovado, ou se o usuário é um admin
+
+            if (relatedTrades.length > 0) {
+                const senderBookId = relatedTrades[0].booksender_id;
+                const receiverBookId = relatedTrades[0].bookreceiver_id;
+
+                const senderBook = await Book.findByPk(senderBookId, { include: User });
+                const receiverBook = await Book.findByPk(receiverBookId, { include: User });
+
+                return res.render("book-details", {
+                    book,
+                    senderBook,
+                    receiverBook,
+                    isUser: userId,
+                    isAdmin,
+                    myBooks,
+                    req,
+                    pageTitle: book.name,
+                    validationErrors: req.flash('validationErrors')
+                });
+            }
+
             if ((book.status === 'available' && book.approvalStatus === 'approved') || isAdmin) {
-                res.render("book-details", {
-                    book: book,
-                    isUser: req.session.userId,
-                    isAdmin: isAdmin,
-                    req: req,
-                    pageTitle: book.name
+                return res.render("book-details", {
+                    book,
+                    isUser: userId,
+                    isAdmin,
+                    myBooks,
+                    req,
+                    pageTitle: book.name,
+                    validationErrors: req.flash('validationErrors')
                 });
             } else {
-                // Caso contrário, renderiza uma página de erro informando que o livro não está disponível para o usuário
-                res.status(403).render("error", {
-                    message: "Este livro não está mais disponível.",
-                    req: req,
-                    error: { status: 403 }
-                });
+                req.flash("validationErrors", "Este livro não está mais disponível.");
+                return res.redirect("/livros");
             }
+        } else {
+            // Aqui estava o erro antes, pois faltava validationErrors
+            return res.render("book-details", {
+                book,
+                isUser: userId,
+                isAdmin,
+                req,
+                pageTitle: book.name,
+                validationErrors: req.flash('validationErrors')  // Corrigido
+            });
         }
     } catch (error) {
         console.error("Erro ao buscar o livro:", error);
-        res.status(500).send("Erro ao buscar o livro");
+        req.flash("validationErrors", "Erro interno ao buscar o livro.");
+        return res.redirect("/livros");
     }
 };
+
 
 exports.removeBook = async (req, res) => {
     const { id } = req.params;
@@ -368,7 +387,7 @@ exports.addTitle = async (req, res) => {
                 name: req.body.name,
                 description: req.body.description,
                 author: req.body.author,
-                image: req.file.filename,  // Aqui pega o arquivo enviado pelo multer
+                 image: req.file.path,
             });
             req.flash('added', true);
             res.redirect('/books/titles/add');

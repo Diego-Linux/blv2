@@ -44,7 +44,7 @@ exports.requestTrade = async (req, res) => {
         });
         if (existingTrade) {
             req.flash('validationErrors', 'Você já fez uma solicitação usando este livro.');
-            return res.redirect(`/req/${bookreceiver_id}`);
+            return res.redirect(`/books/${bookreceiver_id}`);
         }
         // Cria a solicitação de troca
         const newTrade = await Trade.create({ status: 'pending' });
@@ -71,7 +71,7 @@ exports.requestTrade = async (req, res) => {
             sender_id: sender_id // Usuário que enviou a solicitação
         });
 
-        return res.redirect('/mybooks');
+        return res.redirect('/trade/myrequests');
     } catch (err) {
         res.render('error')
     }
@@ -109,7 +109,7 @@ exports.cancelRequest = async (req, res) => {
         });
 
         req.flash('validationErrors', 'Solicitação cancelada com sucesso.');
-        res.redirect('/trade/mytrades');
+        res.redirect('/trade/myrequests');
     } catch (error) {
         console.error('Erro ao cancelar solicitação:', error);
         res.status(500).send('Erro ao cancelar solicitação');

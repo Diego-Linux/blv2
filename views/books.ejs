@@ -6,7 +6,9 @@
         Livros disponíveis</h3><br/>
     <div class="search-container">
         <div class="search-div">
-            <select name="category" id="category" class="search-select" onchange="this.form.submit()">
+            <select name="category" id="category" class="search-select main"
+            style="width:250px;"
+            onchange="this.form.submit()">
                 <option value="">Todas as categorias</option>
                 <option value="Geral" <% if (selectedCategory==='Geral' ) { %>selected<% } %>>Geral</option>
                 <% categories.forEach(category=> { %>

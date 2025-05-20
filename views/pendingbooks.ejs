@@ -2,8 +2,8 @@
   <% include font-control.ejs %>
     <div class="bookrequests-main">
       <h2 class="bookrequests-title">Solicitações de novos livros</h2>
-      <div class="div-pagination">
-        <ul class="pagination">
+      <div class="div-pagination pending">
+        <ul class="pagination pending">
           <% for (let i=1; i <=totalPages; i++) { %>
             <li class="page-item <%= currentPage == i ? 'active' : '' %>">
               <a class="page-link" href="/books/admin/book-request?page=<%= i %>">
@@ -21,9 +21,7 @@
               <img src="<%= book.image %>" alt="Capa do livro">
             </div>
             <div class="bookrequests-card-info">
-              <p><strong>Solicitante:</strong> <a href="#">
-                  <%= book.user.name %>
-                </a></p>
+              <p><strong>Solicitante:</strong> <a href="/user/<%= book.user.id %>"><%= book.user.name%></a></p>
               <p><strong>Livro:</strong> <a href="/books/<%= book.id %>">
                   <%= book.name %>
                 </a></p>

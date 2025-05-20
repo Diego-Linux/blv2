@@ -86,10 +86,18 @@
                   </ul>
                 </li>
 
-                <li><a href="#"><i class="fas fa-user"></i> Minha conta <i class="fas fa-chevron-down"></i></a>
-                  <ul class="submenu">
-                    <li><a href="/edit-profile"><i class="fas fa-user-cog"></i> Editar perfil</a></li>
-                    <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Desconectar</a></li>
+                <li>
+                  <a href="#">
+                    <% if (req.session.image) { %>
+                      <img src="<%= req.session.image %>" alt="Foto do usuário" class="user-photo-inline" />
+                      <% } else { %>
+                        <i class="fas fa-user"></i>
+                        <% } %>
+                           <i class="fas fa-chevron-down"></i>
+                  </a>
+                  <ul class="submenu avatar">
+                    <li><a href="/edit-profile"><i class="fas fa-user-cog"></i></a></li>
+                    <li><a href="/logout"><i class="fas fa-sign-out-alt"></i></a></li>
                   </ul>
                 </li>
                 <% } else { %>
