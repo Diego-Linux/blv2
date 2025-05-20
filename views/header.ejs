@@ -1,22 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca livre</title>
+  <title>Biblioteca Livre</title>
+
+  <!-- CSS personalizado -->
   <link rel="stylesheet" href="/css/style.css">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet" />
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+
+  <!-- Toastr CSS atualizado -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body class="fade">
+
   <nav>
     <div class="logo">
       <img src="https://res.cloudinary.com/dyrynber4/image/upload/v1747781964/relogo_vhcsyn.png" alt="Logo" style="height: 50px; width: auto;">
     </div>
+
     <ul id="menuList">
       <% if (req.session.userId) { %>
         <div class="notification-icon" onclick="toggleNotifications()">
@@ -25,139 +31,142 @@
             <%= req.session.notificationCount || 0 %>
           </span>
           <ul id="notificationMenu" class="submenu notif" style="max-height: 300px; overflow-y: auto;">
-            <% if (req.session.notifications && req.session.notifications.length> 0) { %>
-              <% req.session.notifications.forEach(notification=> { %>
+            <% if (req.session.notifications && req.session.notifications.length > 0) { %>
+              <% req.session.notifications.forEach(notification => { %>
                 <li style="display: flex; flex-direction: column; padding: 8px 12px;">
                   <form action="/notifications/read/<%= notification.id %>" method="POST" style="display:inline;">
-                    <% let redirectTo='/' ; const msg=notification.message.toLowerCase(); if (msg.includes('recebeu')) {
-                      redirectTo='/trade/reqlist' ; } else if ( msg.includes('aceitou') || msg.includes('foi aceita') ||
-                      msg.includes('cancelada') || msg.includes('confirmou') || msg.includes('concluída') ||
-                      msg.includes('sucesso') || msg.includes('iniciaram') ) { redirectTo='/trade/mytrades' ; } %>
-                      <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
-                      <button type="submit" class="notification-btn">
-                        <%= notification.message %>
-                      </button>
+                    <% let redirectTo = '/'; const msg = notification.message.toLowerCase(); if (msg.includes('recebeu')) {
+                      redirectTo = '/trade/reqlist';
+                    } else if (
+                      msg.includes('aceitou') || msg.includes('foi aceita') ||
+                      msg.includes('cancelada') || msg.includes('confirmou') ||
+                      msg.includes('concluída') || msg.includes('sucesso') ||
+                      msg.includes('iniciaram')
+                    ) {
+                      redirectTo = '/trade/mytrades';
+                    } %>
+                    <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
+                    <button type="submit" class="notification-btn">
+                      <%= notification.message %>
+                    </button>
                   </form>
                   <small style="font-size: 15px; color: #888;">
-                    <%= new Date(notification.createdAt).toLocaleString('pt-BR', { dateStyle: 'short' ,
-                      timeStyle: 'short' }) %>
+                    <%= new Date(notification.createdAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) %>
                   </small>
                 </li>
-                <% }) %>
-                  <% } else { %>
-                    <li class="no-notification">
-                      <i class="fas fa-inbox"></i> Sem novas notificações
-                    </li>
-
-                    <% } %>
+              <% }) %>
+            <% } else { %>
+              <li class="no-notification">
+                <i class="fas fa-inbox"></i> Sem novas notificações
+              </li>
+            <% } %>
           </ul>
         </div>
+      <% } %>
+
+      <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+
+      <% if (req.session.userId) { %>
+        <li><a href="#"><i class="fas fa-book"></i> Livros <i class="fas fa-chevron-down"></i></a>
+          <ul class="submenu">
+            <li><a href="/books"><i class="fas fa-book-open"></i>Disponíveis</a></li>
+            <li><a href="/mybooks"><i class="fas fa-book"></i> Minha estante</a></li>
+            <li><a href="/books/add"><i class="fas fa-plus-circle"></i> Adicionar Livro</a></li>
+            <li><a href="/books/book-details"><i class="fas fa-search"></i> Consultar livro</a></li>
+            <li><a href="/books/titles"><i class="fas fa-star"></i> Resenhas</a></li>
+          </ul>
+        </li>
+
+        <% if (req.session.isAdmin) { %>
+          <li><a href="#"><i class="fas fa-tools"></i> Administrador <i class="fas fa-chevron-down"></i></a>
+            <ul class="submenu">
+              <li><a href="/books/admin/book-request"><i class="fas fa-clipboard-check"></i> Pedidos (<%= req.session.pending %>)</a></li>
+              <li><a href="/books/titles/add"><i class="fas fa-pen"></i> Nova resenha</a></li>
+            </ul>
+          </li>
         <% } %>
 
-          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+        <li><a href="#"><i class="fas fa-exchange-alt"></i> Trades <i class="fas fa-chevron-down"></i></a>
+          <ul class="submenu">
+            <li><a href="/trade/reqlist"><i class="fas fa-inbox"></i> Solicitações recebidas</a></li>
+            <li><a href="/trade/myrequests"><i class="fas fa-paper-plane"></i> Solicitações enviadas</a></li>
+            <li><a href="/trade/mytrades"><i class="fas fa-list"></i> Minhas Trades</a></li>
+          </ul>
+        </li>
 
-          <% if (req.session.userId) { %>
-            <li><a href="#"><i class="fas fa-book"></i> Livros <i class="fas fa-chevron-down"></i></a>
-              <ul class="submenu">
-                <li><a href="/books"><i class="fas fa-book-open"></i>Disponíveis</a></li>
-                <li><a href="/mybooks"><i class="fas fa-book"></i> Minha estante</a></li>
-                <li><a href="/books/add"><i class="fas fa-plus-circle"></i> Adicionar Livro</a></li>
-                <li><a href="/books/book-details"><i class="fas fa-search"></i> Consultar livro</a></li>
-                <li><a href="/books/titles"><i class="fas fa-star"></i> Resenhas</a></li>
-              </ul>
-            </li>
-
-            <% if (req.session.isAdmin) { %>
-              <li><a href="#"><i class="fas fa-tools"></i> Administrador <i class="fas fa-chevron-down"></i></a>
-                <ul class="submenu">
-                  <li><a href="/books/admin/book-request"><i class="fas fa-clipboard-check"></i> Pedidos(<%=
-                        req.session.pending %>)</a></li>
-                  <li><a href="/books/titles/add"><i class="fas fa-pen"></i> Nova resenha</a></li>
-                </ul>
-              </li>
-              <% } %>
-
-                <li><a href="#"><i class="fas fa-exchange-alt"></i> Trades <i class="fas fa-chevron-down"></i></a>
-                  <ul class="submenu">
-                    <li><a href="/trade/reqlist"><i class="fas fa-inbox"></i> Solicitações recebidas</a></li>
-                    <li><a href="/trade/myrequests"><i class="fas fa-paper-plane"></i> Solicitações enviadas</a></li>
-
-                    <li><a href="/trade/mytrades"><i class="fas fa-list"></i> Minhas Trades</a></li>
-                  </ul>
-                </li>
-
-                <li>
-                  <a href="#">
-                    <% if (req.session.image) { %>
-                      <img src="<%= req.session.image %>" alt="" class="user-photo-inline" />
-                      <% } else { %>
-                        <i class="fas fa-user"></i>
-                        <% } %>
-                           <i class="fas fa-chevron-down"></i>
-                  </a>
-                  <ul class="submenu avatar">
-                    <li><a href="/edit-profile"><i class="fas fa-user-cog"></i></a></li>
-                    <li><a href="/logout"><i class="fas fa-sign-out-alt"></i></a></li>
-                  </ul>
-                </li>
-                <% } else { %>
-                  <li><a href="/login"><i class="fas fa-sign-in-alt"></i> Entrar</a></li>
-                  <% } %>
+        <li>
+          <a href="#">
+            <% if (req.session.image) { %>
+              <img src="<%= req.session.image %>" alt="" class="user-photo-inline" />
+            <% } else { %>
+              <i class="fas fa-user"></i>
+            <% } %>
+            <i class="fas fa-chevron-down"></i>
+          </a>
+          <ul class="submenu avatar">
+            <li><a href="/edit-profile"><i class="fas fa-user-cog"></i></a></li>
+            <li><a href="/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+          </ul>
+        </li>
+      <% } else { %>
+        <li><a href="/login"><i class="fas fa-sign-in-alt"></i> Entrar</a></li>
+      <% } %>
     </ul>
 
     <div class="menu-icon">
-      <i class="fas fa-solid fa-bars" onclick="toggleMenu()"></i>
+      <i class="fas fa-bars" onclick="toggleMenu()"></i>
     </div>
   </nav>
-</body>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const menuItems = document.querySelectorAll('nav ul li a');
-    menuItems.forEach(item => {
-      item.addEventListener('click', function (e) {
-        const submenu = this.nextElementSibling;
-        if (submenu && submenu.classList.contains('submenu')) {
-          e.preventDefault();
-          // Fechar todos os submenus
-          document.querySelectorAll('nav ul li ul.submenu').forEach(s => {
-            if (s !== submenu) {
-              s.style.display = 'none'; // Fecha outros submenus
-            }
-          });
-          // Alternar o submenu clicado
-          submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-        }
+  <!-- JS Scripts (ao final do body para melhor performance) -->
+
+  <!-- jQuery via HTTPS e versão atual -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Toastr JS atualizado -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <!-- Scripts personalizados -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const menuItems = document.querySelectorAll('nav ul li a');
+      menuItems.forEach(item => {
+        item.addEventListener('click', function (e) {
+          const submenu = this.nextElementSibling;
+          if (submenu && submenu.classList.contains('submenu')) {
+            e.preventDefault();
+            document.querySelectorAll('nav ul li ul.submenu').forEach(s => {
+              if (s !== submenu) s.style.display = 'none';
+            });
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+          }
+        });
       });
     });
-  });
 
-  function toggleNotifications() {
-    const notificationMenu = document.getElementById('notificationMenu');
-    // Fechar outros menus abertos (se houver)
-    document.querySelectorAll('nav ul.submenu').forEach(submenu => {
-      if (submenu !== notificationMenu) {
-        submenu.style.display = 'none';
-      }
-    });
-    // Exibir/esconder o menu de notificações
-    notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
-  }
-  function formatNotificationDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} segundo(s) atrás`;
-    } else if (diffInSeconds < 3600) {
-      return `${Math.floor(diffInSeconds / 60)} minuto(s) atrás`;
-    } else if (diffInSeconds < 86400) {
-      return `${Math.floor(diffInSeconds / 3600)} hora(s) atrás`;
-    } else {
-      return date.toLocaleDateString(); // Exibe a data completa para notificações mais antigas
+    function toggleNotifications() {
+      const notificationMenu = document.getElementById('notificationMenu');
+      document.querySelectorAll('nav ul.submenu').forEach(submenu => {
+        if (submenu !== notificationMenu) submenu.style.display = 'none';
+      });
+      notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
     }
-  }
-</script>
+
+    function formatNotificationDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+      if (diffInSeconds < 60) {
+        return `${diffInSeconds} segundo(s) atrás`;
+      } else if (diffInSeconds < 3600) {
+        return `${Math.floor(diffInSeconds / 60)} minuto(s) atrás`;
+      } else if (diffInSeconds < 86400) {
+        return `${Math.floor(diffInSeconds / 3600)} hora(s) atrás`;
+      } else {
+        return date.toLocaleDateString();
+      }
+    }
+  </script>
+</body>
 
 </html>
