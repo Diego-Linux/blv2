@@ -9,6 +9,14 @@
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   }
+
+  // Mesma lógica das estrelas, baseada no tradeCount
+  let starsToShow = 0;
+  if (user.tradeCount >= 50) starsToShow = 5;
+  else if (user.tradeCount >= 40) starsToShow = 4;
+  else if (user.tradeCount >= 10) starsToShow = 3;
+  else if (user.tradeCount >= 2) starsToShow = 2;
+  else if (user.tradeCount >= 1) starsToShow = 1;
 %>
 
 <div class="main-details">
@@ -27,11 +35,13 @@
         <div class="user-info">
             <h2><%= user.name %></h2>
             <div class="user-rating">
-                <span class="star">&#9733;</span>
-                <span class="star">&#9733;</span>
-                <span class="star">&#9733;</span>
-                <span class="star">&#9733;</span>
-                <span class="star">&#9734;</span>
+                <% for(let i = 1; i <= 5; i++) { %>
+                    <% if (i <= starsToShow) { %>
+                        <span class="star filled">&#9733;</span>
+                    <% } else { %>
+                        <span class="star">&#9734;</span>
+                    <% } %>
+                <% } %>
             </div>
             <p>Membro desde: <%= formatDate(user.createdAt) %></p>
             <p>Trades realizadas: <%= user.tradeCount %></p>
@@ -43,40 +53,38 @@
     </div>
 
     <!-- Seção de pesquisa -->
-<!-- Seção de pesquisa -->
-<div class="search-bar">
-    <form action="/mybooks" method="GET">  <!-- Alterei aqui de /user/<%= user.id %> para /mybooks -->
-        <input type="text" name="search" placeholder="Pesquisar título do livro..." class="search-input" value="<%= searchQuery || '' %>">
-        <button type="submit" class="search-button">Pesquisar</button>
-        <button type="button" class="search-clear" onclick="window.location.href='/mybooks';">Limpar</button>
-    </form>
-</div>
+    <div class="search-bar">
+        <form action="/mybooks" method="GET">
+            <input type="text" name="search" placeholder="Pesquisar título do livro..." class="search-input" value="<%= searchQuery || '' %>">
+            <button type="submit" class="search-button">Pesquisar</button>
+            <button type="button" class="search-clear" onclick="window.location.href='/mybooks';">Limpar</button>
+        </form>
+    </div>
 
     <div class="user-books">
-    <h3 style="color:white; margin-left:0px; margin-top:10px;">Seus livros</h3>
-    <% if (books.length === 0) { %>
-        <p class="alert alert-danger" style="color:white; margin-left:0px;">Nenhum livro encontrado.</p>
-    <% } else { %>
-        <div class="main-container profile">
-            <div class="container profile">
-                <% books.forEach(function(book) { %>
-                    <div class="card" onclick="window.location.href = '/books/<%= book.id %>'">
-                        <% if (book.image && book.image.length > 0) { %>
-                            <img src="<%= book.image %>" alt="Imagem de <%= book.name %>">
-                        <% } else { %>
-                            <img src="/default-book.jpg" alt="Imagem padrão">
-                        <% } %>
-                        <div class="card-content">
-                            <a href="/books/<%= book.id %>">
-                                <%= book.name %>
-                            </a>
+        <h3 style="color:white; margin-left:0px; margin-top:10px;">Seus livros</h3>
+        <% if (books.length === 0) { %>
+            <p class="alert alert-danger" style="color:white; margin-left:0px;">Nenhum livro encontrado.</p>
+        <% } else { %>
+            <div class="main-container profile">
+                <div class="container profile">
+                    <% books.forEach(function(book) { %>
+                        <div class="card" onclick="window.location.href = '/books/<%= book.id %>'">
+                            <% if (book.image && book.image.length > 0) { %>
+                                <img src="<%= book.image %>" alt="Imagem de <%= book.name %>">
+                            <% } else { %>
+                                <img src="/default-book.jpg" alt="Imagem padrão">
+                            <% } %>
+                            <div class="card-content">
+                                <a href="/books/<%= book.id %>">
+                                    <%= book.name %>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                <% }); %>
+                    <% }); %>
+                </div>
             </div>
-        </div>
-    <% } %>
-
+        <% } %>
     </div>
 </div>
 

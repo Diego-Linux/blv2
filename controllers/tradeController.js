@@ -540,18 +540,38 @@ exports.confirmTrade = async (req, res) => {
             await bookSender.save();
             await bookReceiver.save();
 
-            // Incrementa tradeCount dos dois usuários
+            // Incrementa tradeCount e estrela dos dois usuários
             const senderUser = await User.findByPk(checkTrade.sender_id);
             const receiverUser = await User.findByPk(checkTrade.receiver_id);
 
             if (senderUser && receiverUser) {
                 senderUser.tradeCount += 1;
+                senderUser.estrela += 1;          // Incrementa estrela do sender
                 receiverUser.tradeCount += 1;
+                receiverUser.estrela += 1;        // Incrementa estrela do receiver
+
                 await senderUser.save();
                 await receiverUser.save();
+
+                // Notificações de estrela recebida
+                await Notification.create({
+                    type: 'star_received',
+                    message: `Você recebeu 1 estrela por completar uma troca!`,
+                    isRead: false,
+                    receiver_id: senderUser.id,
+                    sender_id: receiverUser.id
+                });
+
+                await Notification.create({
+                    type: 'star_received',
+                    message: `Você recebeu 1 estrela por completar uma troca!`,
+                    isRead: false,
+                    receiver_id: receiverUser.id,
+                    sender_id: senderUser.id
+                });
             }
 
-            // Notificações
+            // Notificações de troca concluída
             await Notification.create({
                 type: 'trade_completed',
                 message: `A troca foi concluída com sucesso!`,

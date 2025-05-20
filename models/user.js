@@ -17,6 +17,10 @@ const User = database.define('user', {
         type: Sequelize.STRING,
         allowNull: false
     },
+     estrela: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+    },
     email: {
         type: Sequelize.STRING,
         allowNull: false

@@ -3215,3 +3215,23 @@ textarea {
         aspect-ratio: 1;
     }
 }
+
+.user-rating {
+  display: flex;
+  gap: 4px;
+  /* alinhamento das estrelas da esquerda para a direita */
+}
+
+.star {
+  font-size: 24px;
+  color: orange; /* cinza para estrela vazia */
+  user-select: none;
+}
+
+.star.filled {
+  color: orange; /* amarelo ouro para estrelas preenchidas */
+}
+
+
+
+

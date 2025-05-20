@@ -32,6 +32,8 @@ router.get('/user/:id', Middleware.isUser, userCtrl.getUserProfileById)
 
 router.get('/req/:id', Middleware.isUser, userCtrl.getSolicitationPage)
 
+router.post('/user/:id/star', Middleware.isUser, userCtrl.giveStar);
+
 router.all('/logout', Middleware.isUser, userCtrl.logout);
 
 module.exports = router;

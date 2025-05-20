@@ -9,6 +9,14 @@
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   }
+
+  // Calcula quantas estrelas mostrar baseado no tradeCount
+  let starsToShow = 0;
+  if (user.tradeCount >= 50) starsToShow = 5;
+  else if (user.tradeCount >= 40) starsToShow = 4;
+  else if (user.tradeCount >= 10) starsToShow = 3;
+  else if (user.tradeCount >= 2) starsToShow = 2;
+  else if (user.tradeCount >= 1) starsToShow = 1;
 %>
 
 <div class="main-details">
@@ -28,11 +36,13 @@
         <div class="user-info">
             <h2><%= user.name %></h2>
             <div class="user-rating">
-                <span class="star">&#9733;</span>
-                <span class="star">&#9733;</span>
-                <span class="star">&#9733;</span>
-                <span class="star">&#9733;</span>
-                <span class="star">&#9734;</span>
+                <% for(let i = 1; i <= 5; i++) { %>
+                    <% if (i <= starsToShow) { %>
+                        <span class="star filled">&#9733;</span>
+                    <% } else { %>
+                        <span class="star">&#9734;</span>
+                    <% } %>
+                <% } %>
             </div>
             <p>Membro desde: <%= formatDate(user.createdAt) %></p>
             <p>Trades realizadas: <%= user.tradeCount %></p>

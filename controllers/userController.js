@@ -163,7 +163,7 @@ exports.createUser = async (req, res) => {
 
         if (userExists) {
             req.session.lastTypedEmail = email;
-            throw new Error('Este e-mail já está em uso');
+            throw new Error('Endereço de e-mail já cadastrado.');
         }
 
         await User.create({
@@ -216,7 +216,7 @@ exports.userLogin = async (req, res) => {
         }
         req.session.userId = user.id;
         req.session.isAdmin = user.isAdmin;
-          req.session.image = user.image;
+        req.session.image = user.image || null; // <-- ESSENCIAL
         if (req.session.isAdmin) {
             await Book.findAll();
             const totalCount = await Book.count({ where: { status: 'pending' } });
@@ -404,6 +404,36 @@ exports.getLandingScreen = async (req, res) => {
         req: req,
     })
 }
+
+exports.giveStar = async (req, res) => {
+    // Verifica se o usuário está logado
+    if (!req.session.userId) {
+        return res.status(403).send('Você precisa estar logado para dar uma estrela');
+    }
+
+    const targetUserId = req.params.id;
+
+    try {
+        // Impede o usuário de dar estrela para si mesmo
+        if (parseInt(req.session.userId) === parseInt(targetUserId)) {
+            return res.status(400).send('Você não pode dar estrela para si mesmo');
+        }
+
+        const user = await User.findByPk(targetUserId);
+        if (!user) {
+            return res.status(404).send('Usuário não encontrado');
+        }
+
+        // Incrementa o campo "estrela"
+        user.estrela += 1;
+        await user.save();
+
+        res.redirect('back'); // ou redirecione para uma página de perfil, por exemplo
+    } catch (error) {
+        console.error('Erro ao dar estrela:', error);
+        res.status(500).send('Erro ao dar estrela');
+    }
+};
 
 exports.logout = (req, res) => {
     req.session.destroy(() => {
