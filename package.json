@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "init": "nodemon server.js",
    "start": "node server.js"
   },
   "keywords": [],

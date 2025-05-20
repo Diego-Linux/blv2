@@ -1198,7 +1198,7 @@ select {
 
 .login-btn-submit {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     border: none;
     border-radius: 8px;
     background-color: var(--main-red);
