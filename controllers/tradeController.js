@@ -357,7 +357,7 @@ exports.acceptTrade = async (req, res) => {
 
             await Notification.create({
                 type: 'trade_update',
-                message: `Sua solicitação de troca pelo livro "${usertrade.bookreceiver.title}" foi automaticamente rejeitada porque o livro já está envolvido em outra troca com ${usertrade.sender.name === otherTrade.sender.name ? usertrade.receiver.name : usertrade.sender.name}.`,
+                message: `Sua solicitação de troca pelo livro "${usertrade.bookreceiver.name}" foi automaticamente rejeitada porque o livro já está envolvido em outra troca com ${usertrade.sender.name === otherTrade.sender.name ? usertrade.receiver.name : usertrade.sender.name}.`,
                 isRead: false,
                 receiver_id: otherTrade.sender_id,
                 sender_id: userId
@@ -383,7 +383,7 @@ exports.acceptTrade = async (req, res) => {
 
             await Notification.create({
                 type: 'trade_update',
-                message: `Sua solicitação para trocar seu livro "${usertrade.booksender.title}" pelo livro "${myTrade.bookreceiver.title}" foi automaticamente cancelada porque você entrou em outra troca.`,
+                message: `Sua solicitação para trocar seu livro "${usertrade.booksender.name}" pelo livro "${myTrade.bookreceiver.name}" foi automaticamente cancelada porque você entrou em outra troca.`,
                 isRead: false,
                 receiver_id: myTrade.receiver_id,
                 sender_id: usertrade.sender_id
