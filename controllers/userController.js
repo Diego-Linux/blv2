@@ -38,15 +38,8 @@ exports.loadNotifications = async (req, res, next) => {
         // Adicionar notificações à sessão
         req.session.notifications = notifications;
         req.session.notificationCount = unreadNotificationsCount; // Somente não lidas
-
-        // Logando informações para depuração
-        console.log('User ID:', req.session.userId);
-        console.log('Notifications:', notifications);
-        console.log('Unread Notifications Count:', unreadNotificationsCount);
-
         next(); // Passar para o próximo middleware ou rota
     } catch (error) {
-        console.error('Erro ao obter notificações:', error);
         next(); // Chame o próximo middleware mesmo se houver erro
     }
 };
@@ -312,7 +305,6 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-
 exports.getBooksUser = async (req, res) => {
     const userId = req.session.userId; // ID do usuário logado
     const page = parseInt(req.query.page) || 1; // Página atual, padrão é 1
@@ -371,7 +363,6 @@ exports.getBooksUser = async (req, res) => {
             currentUser: { id: userId } // Passa o ID do usuário logado
         });
     } catch (error) {
-        console.error('Erro ao buscar livros do usuário:', error);
         res.status(500).send('Erro ao buscar livros do usuário');
     }
 };
@@ -394,7 +385,6 @@ exports.getSolicitationPage = async (req, res) => {
             pageTitle:'Solicitação de Troca'
         });
     } catch (error) {
-        console.error('Erro ao carregar página de solicitação:', error);
         res.status(500).send('Erro ao carregar página de solicitação');
     }
 };
@@ -430,7 +420,6 @@ exports.giveStar = async (req, res) => {
 
         res.redirect('back'); // ou redirecione para uma página de perfil, por exemplo
     } catch (error) {
-        console.error('Erro ao dar estrela:', error);
         res.status(500).send('Erro ao dar estrela');
     }
 };
