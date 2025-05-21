@@ -3,6 +3,8 @@
 
 <% function formatDate(dateString) {
     const date = new Date(dateString);
+    date.setHours(date.getHours() - 3); // Corrige para UTC-3 (horário de Brasília)
+
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear().toString().slice(2);
@@ -10,6 +12,7 @@
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${day}/${month}/${year} às ${hours}:${minutes}`;
 } %>
+
 
 <div class="card-mytrade-container">
     <h3 class="card-mytrade-title">Minhas trades</h3>
