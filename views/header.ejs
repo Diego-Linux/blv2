@@ -4,25 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Biblioteca Livre</title>
-
-  <!-- CSS personalizado -->
+  <title>Biblioteca livre</title>
   <link rel="stylesheet" href="/css/style.css">
-
-  <!-- Toastr CSS atualizado -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-
-  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body class="fade">
-
   <nav>
     <div class="logo">
       <img src="https://res.cloudinary.com/dyrynber4/image/upload/v1747781964/relogo_vhcsyn.png" alt="Logo" style="height: 50px; width: auto;">
     </div>
-
     <ul id="menuList">
       <% if (req.session.userId) { %>
         <div class="notification-icon" onclick="toggleNotifications()">
@@ -35,23 +29,31 @@
               <% req.session.notifications.forEach(notification => { %>
                 <li style="display: flex; flex-direction: column; padding: 8px 12px;">
                   <form action="/notifications/read/<%= notification.id %>" method="POST" style="display:inline;">
-                    <% let redirectTo = '/'; const msg = notification.message.toLowerCase(); if (msg.includes('recebeu')) {
-                      redirectTo = '/trade/reqlist';
-                    } else if (
-                      msg.includes('aceitou') || msg.includes('foi aceita') ||
-                      msg.includes('cancelada') || msg.includes('confirmou') ||
-                      msg.includes('concluída') || msg.includes('sucesso') ||
-                      msg.includes('iniciaram')
-                    ) {
-                      redirectTo = '/trade/mytrades';
-                    } %>
+                    <% 
+                      let redirectTo = '/';
+                      const msg = notification.message.toLowerCase(); 
+                      if (msg.includes('recebeu')) {
+                        redirectTo = '/trade/reqlist';
+                      } else if (
+                        msg.includes('aceitou') || msg.includes('foi aceita') ||
+                        msg.includes('cancelada') || msg.includes('confirmou') ||
+                        msg.includes('concluída') || msg.includes('sucesso') ||
+                        msg.includes('iniciaram')
+                      ) {
+                        redirectTo = '/trade/mytrades';
+                      }
+                    %>
                     <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
                     <button type="submit" class="notification-btn">
                       <%= notification.message %>
                     </button>
                   </form>
                   <small style="font-size: 15px; color: #888;">
-                    <%= new Date(notification.createdAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) %>
+                    <%= new Intl.DateTimeFormat('pt-BR', {
+                          dateStyle: 'short',
+                          timeStyle: 'short',
+                          timeZone: 'America/Sao_Paulo'
+                        }).format(new Date(notification.createdAt)) %>
                   </small>
                 </li>
               <% }) %>
@@ -117,56 +119,32 @@
       <i class="fas fa-bars" onclick="toggleMenu()"></i>
     </div>
   </nav>
+</body>
 
-  <!-- JS Scripts (ao final do body para melhor performance) -->
-
-  <!-- jQuery via HTTPS e versão atual -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- Toastr JS atualizado -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-  <!-- Scripts personalizados -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const menuItems = document.querySelectorAll('nav ul li a');
-      menuItems.forEach(item => {
-        item.addEventListener('click', function (e) {
-          const submenu = this.nextElementSibling;
-          if (submenu && submenu.classList.contains('submenu')) {
-            e.preventDefault();
-            document.querySelectorAll('nav ul li ul.submenu').forEach(s => {
-              if (s !== submenu) s.style.display = 'none';
-            });
-            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-          }
-        });
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuItems = document.querySelectorAll('nav ul li a');
+    menuItems.forEach(item => {
+      item.addEventListener('click', function (e) {
+        const submenu = this.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+          e.preventDefault();
+          document.querySelectorAll('nav ul li ul.submenu').forEach(s => {
+            if (s !== submenu) s.style.display = 'none';
+          });
+          submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
       });
     });
+  });
 
-    function toggleNotifications() {
-      const notificationMenu = document.getElementById('notificationMenu');
-      document.querySelectorAll('nav ul.submenu').forEach(submenu => {
-        if (submenu !== notificationMenu) submenu.style.display = 'none';
-      });
-      notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function formatNotificationDate(dateString) {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffInSeconds = Math.floor((now - date) / 1000);
-      if (diffInSeconds < 60) {
-        return `${diffInSeconds} segundo(s) atrás`;
-      } else if (diffInSeconds < 3600) {
-        return `${Math.floor(diffInSeconds / 60)} minuto(s) atrás`;
-      } else if (diffInSeconds < 86400) {
-        return `${Math.floor(diffInSeconds / 3600)} hora(s) atrás`;
-      } else {
-        return date.toLocaleDateString();
-      }
-    }
-  </script>
-</body>
+  function toggleNotifications() {
+    const notificationMenu = document.getElementById('notificationMenu');
+    document.querySelectorAll('nav ul.submenu').forEach(submenu => {
+      if (submenu !== notificationMenu) submenu.style.display = 'none';
+    });
+    notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
 
 </html>
