@@ -26,6 +26,12 @@
             trade.trade.status === 'completed' ? 'completed' : 'active' %>">
 
         <div class="card-mytrade-card-content">
+            <p>
+  <a href="/trade/details/<%= trade.id %>" class="card-mytrade-link details">
+    Clique aqui para os detalhes da trade
+  </a>
+</p>
+
           <p><strong>Solicitado por:</strong>
   <a href="/user/<%= trade.sender.id %>">
     <%= trade.sender.id === req.session.userId ? 'Você' : trade.sender.name %>
@@ -52,7 +58,7 @@
             <p><strong>Data de criação da trade:</strong> <%= formatDate(trade.createdAt) %></p>
 
             <!-- Ações -->
-            <div class="card-mytrade-actions">
+            <!-- <div class="card-mytrade-actions">
                 <% if ((trade.trade.status === 'progress' || trade.trade.status === 'waiting') && !alreadyConfirmed) { %>
                     <button class="card-mytrade-btn-confirm"
                         onclick="openModal('modal-accept-<%= trade.id %>')">Concluir Trade</button>
@@ -65,7 +71,7 @@
                 <% } else if (trade.trade.status === 'cancelled') { %>
                     <p class="text-danger">Troca cancelada.</p>
                 <% } %>
-            </div>
+            </div> -->
         </div>
         <div class="card-mytrade-images">
             <img src="<%= trade.booksender.image %>" alt="Imagem de <%= trade.booksender.name %>" class="card-mytrade-image" />

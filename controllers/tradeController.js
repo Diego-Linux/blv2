@@ -1,9 +1,10 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const Book = require('../models/book')
 const User = require('../models/user')
 const Trade = require('../models/trade')
 const Notification = require('../models/notification')
 const Usertrade = require('../models/usertrade')
+const Message = require('../models/message')
 
 exports.requestTrade = async (req, res) => {
     try {
@@ -438,7 +439,6 @@ exports.acceptTrade = async (req, res) => {
     }
 };
 
-
 exports.rejectTrade = async (req, res) => {
     const tradeId = req.params.id;
     try {
@@ -475,6 +475,234 @@ exports.rejectTrade = async (req, res) => {
         res.status(500).send('Erro ao rejeitar troca');
     }
 };
+
+exports.tradeDetails = async (req, res) => {
+    const userId = req.session.userId;
+    const tradeId = req.params.id; // tradeId vindo da rota
+
+    try {
+        // Verificar se o usuário faz parte da trade
+        const tradeData = await Usertrade.findOne({
+            where: {
+                trade_id: tradeId,
+                [Op.or]: [
+                    { receiver_id: userId },
+                    { sender_id: userId }
+                ]
+            },
+            include: [
+                {
+                    model: Trade,
+                    as: 'trade'
+                },
+                {
+                    model: Book,
+                    as: 'bookreceiver',
+                    attributes: ['id', 'name', 'image']
+                },
+                {
+                    model: Book,
+                    as: 'booksender',
+                    attributes: ['id', 'name', 'image']
+                },
+                {
+                    model: User,
+                    as: 'sender',
+                    attributes: ['id', 'name', 'image']
+                },
+                {
+                    model: User,
+                    as: 'receiver',
+                    attributes: ['id', 'name', 'image']
+                }
+            ]
+        });
+
+        if (!tradeData) {
+            return res.status(403).send('Você não tem acesso a esta troca.');
+        }
+
+        // Buscar mensagens da trade
+        const messages = await Message.findAll({
+            where: { trade_id: tradeId },
+            include: [
+                {
+                    model: User,
+                    as: 'sender',
+                    attributes: ['id', 'name', 'image']
+                }
+            ],
+            order: [['createdAt', 'ASC']]
+        });
+
+        res.render('trade-details', {
+            validationErrors: req.flash('validationErrors'),
+            tradeData,
+            messages,
+            req
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar detalhes da trade:', error);
+        res.status(500).send('Erro ao carregar detalhes da trade');
+    }
+};
+
+exports.sendMessage = async (req, res) => {
+    const { tradeId, content } = req.body;
+    const senderId = req.session.userId;
+
+    try {
+        // Verificar se trade existe na tabela user_trade e se user é participante
+        const userTrade = await Usertrade.findOne({
+            where: { trade_id: tradeId },
+            // só para checar se o usuário faz parte
+            // aqui você pode buscar o registro que tem sender_id ou receiver_id igual ao user
+            // Para facilitar:
+            // você pode fazer uma consulta onde trade_id = tradeId
+            // e (sender_id = senderId OR receiver_id = senderId)
+            // Sequelize permite operadores OR
+            where: {
+                trade_id: tradeId,
+                [Sequelize.Op.or]: [
+                    { sender_id: senderId },
+                    { receiver_id: senderId }
+                ]
+            }
+        });
+
+        if (!userTrade) {
+            return res.status(403).send('Você não tem permissão para enviar mensagens nesta trade.');
+        }
+
+        if (!content || content.trim() === '') {
+            req.flash('validationErrors', 'Mensagem não pode estar vazia.');
+            return res.redirect(`/trade/${tradeId}`); // ajustar para sua rota real
+        }
+
+        await Message.create({
+            trade_id: tradeId,
+            sender_id: senderId,
+            content: content.trim()
+        });
+
+        res.redirect(`/trade/details/${tradeId}`); // voltar para a tela da trade com chat
+
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+        res.status(500).send('Erro ao enviar mensagem');
+    }
+};
+
+exports.editMessage = async (req, res) => {
+    const userId = req.session.userId;
+    const messageId = req.params.id;
+    const { content } = req.body;
+
+    try {
+        const message = await Message.findByPk(messageId);
+
+        if (!message) {
+            req.flash('validationErrors', 'Mensagem não encontrada.');
+            return res.redirect('back');
+        }
+
+        // Verificar se o usuário é participante da trade
+        const isParticipant = await Usertrade.findOne({
+            where: {
+                trade_id: message.trade_id,
+                [Op.or]: [
+                    { sender_id: userId },
+                    { receiver_id: userId }
+                ]
+            }
+        });
+
+        if (!isParticipant) {
+            req.flash('validationErrors', 'Você não tem permissão para editar mensagens nesta trade.');
+            return res.redirect('back');
+        }
+
+        // Verificar se é o dono da mensagem
+        if (message.sender_id !== userId) {
+            req.flash('validationErrors', 'Só é possível editar suas próprias mensagens.');
+            return res.redirect('back');
+        }
+
+        // Verificar limite de tempo (5 minutos)
+        const cincoMinutos = 5 * 60 * 1000;
+        if (new Date() - new Date(message.createdAt) > cincoMinutos) {
+            req.flash('validationErrors', 'O prazo para editar a mensagem expirou (5 minutos).');
+            return res.redirect('back');
+        }
+
+        // Validar conteúdo
+        if (!content || content.trim() === '') {
+            req.flash('validationErrors', 'Mensagem não pode estar vazia.');
+            return res.redirect('back');
+        }
+
+        // Atualizar
+        await message.update({ content: content.trim() });
+
+        res.redirect(`/trade/details/${message.trade_id}`);
+    } catch (error) {
+        console.error('Erro ao editar mensagem:', error);
+        res.status(500).send('Erro ao editar mensagem');
+    }
+};
+
+
+exports.deleteMessage = async (req, res) => {
+    const userId = req.session.userId;
+    const messageId = req.params.id;
+
+    try {
+        const message = await Message.findByPk(messageId);
+
+        if (!message) {
+            req.flash('validationErrors', 'Mensagem não encontrada.');
+            return res.redirect('back');
+        }
+
+        // Verificar se o usuário é participante da trade
+        const isParticipant = await Usertrade.findOne({
+            where: {
+                trade_id: message.trade_id,
+                [Op.or]: [
+                    { sender_id: userId },
+                    { receiver_id: userId }
+                ]
+            }
+        });
+
+        if (!isParticipant) {
+            req.flash('validationErrors', 'Você não tem permissão para excluir mensagens nesta trade.');
+            return res.redirect('back');
+        }
+
+        // Verificar se é o dono da mensagem
+        if (message.sender_id !== userId) {
+            req.flash('validationErrors', 'Só é possível excluir suas próprias mensagens.');
+            return res.redirect('back');
+        }
+
+        // Verificar limite de tempo (5 minutos)
+        const cincoMinutos = 5 * 60 * 1000;
+        if (new Date() - new Date(message.createdAt) > cincoMinutos) {
+            req.flash('validationErrors', 'O prazo para excluir a mensagem expirou (5 minutos).');
+            return res.redirect('back');
+        }
+
+        await message.destroy();
+
+        res.redirect(`/trade/details/${message.trade_id}`);
+    } catch (error) {
+        console.error('Erro ao excluir mensagem:', error);
+        res.status(500).send('Erro ao excluir mensagem');
+    }
+};
+
 
 exports.confirmTrade = async (req, res) => {
     const tradeId = req.params.id;

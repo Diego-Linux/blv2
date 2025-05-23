@@ -3007,7 +3007,8 @@ textarea {
     padding: 5px 10px 0 20px;
     background: var(--card-bg);
     color: #222;
-    overflow: hidden; /* evita conteúdo vazando */
+    overflow: hidden;
+    /* evita conteúdo vazando */
     padding-bottom: 40px;
 
 }
@@ -3217,21 +3218,573 @@ textarea {
 }
 
 .user-rating {
-  display: flex;
-  gap: 4px;
-  /* alinhamento das estrelas da esquerda para a direita */
+    display: flex;
+    gap: 4px;
+    /* alinhamento das estrelas da esquerda para a direita */
 }
 
 .star {
-  font-size: 24px;
-  color: orange; /* cinza para estrela vazia */
-  user-select: none;
+    font-size: 24px;
+    color: orange;
+    /* cinza para estrela vazia */
+    user-select: none;
 }
 
 .star.filled {
-  color: orange; /* amarelo ouro para estrelas preenchidas */
+    color: orange;
+    /* amarelo ouro para estrelas preenchidas */
+}
+
+.card-mytrade-link.details {
+    color: var(--main-white);
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Layout geral */
+.tela-troca {
+    display: flex;
+    gap: 10px;
+    padding: 30px;
+    width: 100%;
+    margin: auto;
 }
 
 
+/* Coluna de informações */
+.coluna-info {
+    flex: 1;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.coluna-info h2 {
+    margin-bottom: 20px;
+    color: var(--main-white);
+}
+
+.box-info p {
+    margin: 10px 0;
+    color: var(--main-white);
+}
+
+.box-info a {
+    color: var(--main-white);
+    margin-left: 5px;
+    text-decoration: underline;
+}
+
+.imagens-livros {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.imagens-livros img {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.card-mytrade-btn-confirm.td,
+.card-mytrade-btn-cancel.td {
+    width: 200px;
+}
+
+/* Coluna de recados */
+.coluna-recados {
+    flex: 1;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.coluna-recados h2 {
+    margin-bottom: 10px;
+    color: var(--main-white);
+}
+
+.aviso-recados {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+/* Caixa de recados */
+/* Recados - estilo formal, sem cara de chat */
+.box-recados {
+    border-radius: 8px;
+    padding: 0px;
+    background-color: var(--card-bg);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.recado {
+    position: relative;
+    padding: 10px 40px 10px 10px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* Cores dos recados */
+.recado.meu {
+    background-color: var(--card-bg);
+    color: var(--main-white);
+    align-self: flex-end;
+    border:1px solid var(--main-green);
+}
+
+.recado.outro {
+    background-color: var(--card-bg);
+    color: var(--main-white);
+    align-self: flex-start;
+     border:1px solid crimson;
+}
+
+.recado {
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header do recado */
+.recado-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.recado .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.recado .autor {
+    font-weight: bold;
+}
+
+.recado .data {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Conteúdo da mensagem */
+.recado-conteudo {
+    margin-top: 5px;
+    word-break: break-word;
+}
+
+/* Botões editar/excluir */
+.recado-acoes {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-icone {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-icone:hover {
+    opacity: 0.7;
+}
 
 
+.form-recado {
+    width: 100%;
+    margin-top: 10px;
+    background: var(--card-bg);
+    color: white;
+    border-radius: 8px;
+    padding: 0px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-recado textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    resize: none;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.form-recado textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-recado textarea:focus,
+.form-recado button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+.form-recado button {
+    background: var(--main-green);
+    color: white;
+    width: 200px;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-conteudo {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    color: #fff;
+}
+
+.modal-botoes {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal textarea {
+    width: 100%;
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+}
+
+
+/* Modal Editar */
+.modal-editar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    /* quando ativar, controlar via JS */
+}
+
+.modal-editar .modal-conteudo {
+    background-color: var(--card-bg, #222);
+    color: white;
+    padding: 1.8rem 2.4rem;
+    border-radius: 10px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-editar .modal-conteudo h3 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    color: var(--main-green, #28a745);
+}
+
+.modal-editar textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    height: 300px;
+    border-radius: 6px;
+    border: 1.5px solid var(--main-green, #28a745);
+    background-color: #333;
+    color: white;
+    resize: vertical;
+    box-sizing: border-box;
+    margin-bottom: 1.6rem;
+    transition: border-color 0.3s ease;
+}
+
+.modal-editar textarea:focus {
+    outline: none;
+    border-color: var(--main-green-light, #5cd65c);
+    background-color: #2b2b2b;
+}
+
+.modal-editar .modal-botoes {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+
+.modal-editar .modal-botoes button,
+.modal-editar .modal-botoes form button {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.6rem 1.6rem;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 100px;
+}
+
+/* Botão Salvar */
+.modal-editar .modal-botoes button[type="submit"] {
+    background-color: var(--main-green, #28a745);
+    color: white;
+}
+
+/* Botão Cancelar */
+.modal-editar .modal-botoes button[type="button"] {
+    background-color: var(--main-red, #dc3545);
+    color: white;
+}
+
+/* Modal Excluir */
+.modal-excluir {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    /* controlar via JS */
+}
+
+.modal-excluir .modal-conteudo {
+    background-color: var(--card-bg, #222);
+    color: white;
+    padding: 1.8rem 2.4rem;
+    border-radius: 10px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-excluir .modal-conteudo h3 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--main-green, #28a745);
+}
+
+.modal-excluir .modal-conteudo p {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #ddd;
+}
+
+.modal-excluir .modal-botoes {
+    margin-top: 10px;
+    display: flex;
+    gap: 1rem;
+    justify-content: left;
+}
+
+.modal-excluir .modal-botoes button+button {
+    margin-left: 10px;
+}
+
+.modal-excluir .modal-botoes button,
+.modal-excluir .modal-botoes form button {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.6rem 1.6rem;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 100px;
+}
+
+/* Botão Confirmar Exclusão */
+.modal-excluir .modal-botoes button[type="submit"] {
+    background-color: var(--main-green, #28a745);
+    color: white;
+}
+
+/* Botão Cancelar */
+.modal-excluir .modal-botoes button[type="button"] {
+    background-color: var(--main-red, #dc3545);
+    color: white;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+
+    .modal-editar .modal-conteudo,
+    .modal-excluir .modal-conteudo {
+        padding: 1.2rem 1.6rem;
+    }
+
+    .modal-editar .modal-botoes button,
+    .modal-editar .modal-botoes form button,
+    .modal-excluir .modal-botoes button,
+    .modal-excluir .modal-botoes form button {
+        font-size: 0.9rem;
+        min-width: 80px;
+        padding: 0.5rem 1.2rem;
+    }
+}
+
+/* Esconde os modais ao carregar */
+.modal-editar,
+.modal-excluir {
+    display: none;
+}
+
+/* Responsividade para a coluna de recados */
+@media (max-width: 1024px) {
+    .coluna-recados {
+        padding: 16px;
+    }
+
+    .box-recados {
+        max-height: 300px;
+    }
+
+    .form-recado button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .tela-troca {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .coluna-recados,
+    .coluna-info {
+        width: 100%;
+    }
+
+    .box-recados {
+        max-height: 250px;
+    }
+
+    .form-recado button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .coluna-recados {
+        padding: 12px;
+    }
+
+    .box-recados {
+        max-height: 200px;
+    }
+
+    .recado {
+        padding: 8px;
+    }
+
+    .recado-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .recado .data {
+        font-size: 0.75rem;
+    }
+
+    .form-recado textarea {
+        font-size: 13px;
+    }
+
+    .form-recado button {
+        padding: 10px;
+        font-size: 14px;
+        width: 100%;
+    }
+}
+
+.input-trade {
+  margin-top: 8px;
+  width: 300px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: none; /* Remove qualquer borda */
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08); /* Um pouquinho mais visível */
+  color: white;
+  box-sizing: border-box;
+  outline: none; /* Remove contorno de foco */
+}
+
+.input-trade::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Opcional: Se quiser um leve sombreado pra destacar */
+.input-trade {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Mantém sem efeitos de focus irritantes */
+.input-trade:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.acoes-troca{
+    display: flex;
+    flex-direction: column;
+}
