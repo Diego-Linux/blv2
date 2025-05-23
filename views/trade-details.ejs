@@ -150,13 +150,12 @@
                             <input type="hidden" name="tradeId" value="<%= tradeData.trade.id %>">
                             <textarea name="content" rows="3" placeholder="Digite seu recado aqui..."
                                 required></textarea>
-                            <button type="submit">Enviar Recado</button>
+                            <button type="submit">Enviar recado</button>
                         </form>
                         <% } else { %>
                             <p style="margin-top: 1rem; font-style: italic; font-size:18px; color: <%= tradeData.trade.status === 'completed' ? '#198754;' : '#D13239;' %>;">
   Esta trade foi <strong><%= tradeData.trade.status === 'cancelled' ? 'cancelada' : 'concluída' %></strong>. Não é possível enviar novas mensagens.
 </p>
-
                             <% } %>
                 </div>
             </div>
