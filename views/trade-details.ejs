@@ -154,7 +154,7 @@
                         </form>
                         <% } else { %>
                             <p style="margin-top: 1rem; font-style: italic; font-size:19px; color: <%= tradeData.trade.status === 'completed' ? '#198754;' : '#D13239;' %>;">
-  Esta trade foi <strong><%= tradeData.trade.status === 'cancelled' ? 'cancelada' : 'concluída' %></strong>. Não é mais possível enviar mensagens.
+  Esta trade foi <strong><%= tradeData.trade.status === 'cancelled' ? 'cancelada' : 'concluída' %></strong>. Não é possível enviar novas mensagens.
 </p>
 
                             <% } %>
