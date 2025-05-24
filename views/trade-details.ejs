@@ -1,11 +1,23 @@
 <% include header.ejs %>
     <% include font-control.ejs %>
 
-        <% function formatDate(dateString) { const date=new Date(dateString); // Opções para o formato desejado const
-            options={ timeZone: 'America/Sao_Paulo' , day: '2-digit' , month: '2-digit' , year: '2-digit' ,
-            hour: '2-digit' , minute: '2-digit' , hour12: false }; // Formata a data para string local do Brasil const
-            formatted=date.toLocaleString('pt-BR', options); // formatted sai tipo "23/05/25 14:30" // Só trocar o
-            espaço por " às " return formatted.replace(' ', ' às ');
+    <% function formatDate(dateString) {
+  const date = new Date(dateString);
+  // Opções para o formato desejado
+  const options = {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  };
+  // Formata a data para string local do Brasil
+  const formatted = date.toLocaleString('pt-BR', options);
+  // formatted sai tipo "23/05/25 14:30"
+  // Só trocar o espaço por " às "
+  return formatted.replace(' ', ' às ');
 } %>
             <div class="tela-troca">
              
@@ -19,60 +31,61 @@
                     <div class="box-info">
                         <p><strong>Solicitante:</strong>
                             <a href="/user/<%= tradeData.sender.id %>">
-                                <%= tradeData.sender.id===req.session.userId ? ' Você' : tradeData.sender.name %>
-            </a>
-            </p>
-            <p><strong>Receptor:</strong>
-                <a href="/user/<%= tradeData.receiver.id %>">
-                    <%= tradeData.receiver.id===req.session.userId ? 'Você' : tradeData.receiver.name %>
-                </a>
-            </p>
-            <p><strong>Livro Oferecido:</strong>
-                <a href="/books/<%= tradeData.booksender.id %>">
-                    <%= tradeData.booksender.name %>
-                </a>
-            </p>
-            <p><strong>Livro Desejado:</strong>
-                <a href="/books/<%= tradeData.bookreceiver.id %>">
-                    <%= tradeData.bookreceiver.name %>
-                </a>
-            </p>
-            <p><strong>Status da Troca:</strong>
-                <%= tradeData.trade.status %>
-            </p>
-            <p><strong>Código da Trade:</strong>
-                <%= tradeData.trade.id %>
-            </p>
-            <p><strong>Data da Solicitação:</strong>
-                <%= formatDate(tradeData.createdAt) %>
-            </p>
-            </div>
+                                <%= tradeData.sender.id===req.session.userId ? 'Você' : tradeData.sender.name %>
+                            </a>
+                        </p>
+                        <p><strong>Receptor:</strong>
+                            <a href="/user/<%= tradeData.receiver.id %>">
+                                <%= tradeData.receiver.id===req.session.userId ? 'Você' : tradeData.receiver.name %>
+                            </a>
+                        </p>
+                        <p><strong>Livro Oferecido:</strong>
+                            <a href="/books/<%= tradeData.booksender.id %>">
+                                <%= tradeData.booksender.name %>
+                            </a>
+                        </p>
+                        <p><strong>Livro Desejado:</strong>
+                            <a href="/books/<%= tradeData.bookreceiver.id %>">
+                                <%= tradeData.bookreceiver.name %>
+                            </a>
+                        </p>
+                        <p><strong>Status da Troca:</strong>
+                            <%= tradeData.trade.status %>
+                        </p>
+                        <p><strong>Código da Trade:</strong>
+                            <%= tradeData.trade.id %>
+                        </p>
+                        <p><strong>Data da Solicitação:</strong>
+                            <%= formatDate(tradeData.createdAt) %>
+                        </p>
+                    </div>
 
-            <div class="imagens-livros">
-                <img src="<%= tradeData.booksender.image %>" alt="Imagem de <%= tradeData.booksender.name %>">
-                <img src="<%= tradeData.bookreceiver.image %>" alt="Imagem de <%= tradeData.bookreceiver.name %>">
-            </div>
+                    <div class="imagens-livros">
+                        <img src="<%= tradeData.booksender.image %>" alt="Imagem de <%= tradeData.booksender.name %>">
+                        <img src="<%= tradeData.bookreceiver.image %>"
+                            alt="Imagem de <%= tradeData.bookreceiver.name %>">
+                    </div>
 
-            <!-- Ações de concluir e cancelar -->
-            <% const alreadyConfirmed=(req.session.userId===tradeData.sender.id && tradeData.trade.confirmed_by_sender)
-                || (req.session.userId===tradeData.receiver.id && tradeData.trade.confirmed_by_receiver); %>
+                    <!-- Ações de concluir e cancelar -->
+                    <% const alreadyConfirmed=(req.session.userId===tradeData.sender.id &&
+                        tradeData.trade.confirmed_by_sender) || (req.session.userId===tradeData.receiver.id &&
+                        tradeData.trade.confirmed_by_receiver); %>
 
-                <div class="acoes-troca"></br>
-                    <% if ((tradeData.trade.status==='progress' || tradeData.trade.status==='waiting' ) &&
-                        !alreadyConfirmed) { %>
-                        <button class="card-mytrade-btn-confirm td" onclick="abrirModalConcluir()">Concluir
-                            Trade</button>
-                        <button class="card-mytrade-btn-cancel td" onclick="abrirModalCancelar()">Cancelar
-                            Trade</button>
-                        <% } else if (alreadyConfirmed && tradeData.trade.status !=='completed' ) { %>
-                            <p class="text-warning" style="color:orange;">Você já confirmou esta troca. Aguarde o outro
-                                usuário.</p>
-                            <% } else if (tradeData.trade.status==='completed' ) { %>
-                                <p class="text-success" style="color:white;">Troca finalizada com sucesso!</p>
-                                <% } else if (tradeData.trade.status==='cancelled' ) { %>
-                                    <p class="text-danger" style="color:white;">Troca cancelada.</p>
-                                    <% } %>
-                </div>
+                        <div class="acoes-troca"></br>
+                            <% if ((tradeData.trade.status==='progress' || tradeData.trade.status==='waiting' ) &&
+                                !alreadyConfirmed) { %>
+                                <button class="card-mytrade-btn-confirm td" onclick="abrirModalConcluir()">Concluir
+                                    Trade</button>
+                                <button class="card-mytrade-btn-cancel td" onclick="abrirModalCancelar()">Cancelar
+                                    Trade</button>
+                                <% } else if (alreadyConfirmed && tradeData.trade.status !=='completed' ) { %>
+                                    <p class="text-warning" style="color:orange;">Você já confirmou esta troca. Aguarde o outro usuário.</p>
+                                    <% } else if (tradeData.trade.status==='completed' ) { %>
+                                        <p class="text-success" style="color:white;">Troca finalizada com sucesso!</p>
+                                        <% } else if (tradeData.trade.status==='cancelled' ) { %>
+                                            <p class="text-danger" style="color:white;">Troca cancelada.</p>
+                                            <% } %>
+                        </div>
                 </div>
 
                 <!-- Coluna Direita - Recados -->
@@ -106,24 +119,22 @@
                                             </span>
 
                                             <% if (msg.sender.id===req.session.userId) { %>
-                                                <% if (tradeData.trade.status !=='completed' && tradeData.trade.status
-                                                    !=='cancelled' ) { %>
-                                                    <div class="recado-acoes">
-                                                        <button class="btn-icone btn-editar" data-id="<%= msg.id %>"
-                                                            data-content="<%- msg.content.replace(/" /g, '&quot;'
-                                                            ).replace(/(\r\n|\n|\r)/gm, '&#10;' ) %>"
-                                                            onclick="abrirModalEditar(this)">
-                                                            ✏️
-                                                        </button>
+                                               <% if (tradeData.trade.status !== 'completed' && tradeData.trade.status !== 'cancelled') { %>
+  <div class="recado-acoes">
+    <button class="btn-icone btn-editar" data-id="<%= msg.id %>"
+      data-content="<%- msg.content.replace(/" /g, '&quot;').replace(/(\r\n|\n|\r)/gm, '&#10;') %>"
+      onclick="abrirModalEditar(this)">
+      ✏️
+    </button>
 
-                                                        <button class="btn-icone btn-excluir"
-                                                            onclick="abrirModalExcluir('<%= msg.id %>')">
-                                                            🗑️ <!-- ícone alternativo, por exemplo: -->
-                                                        </button>
-                                                    </div>
-                                                    <% } %>
+    <button class="btn-icone btn-excluir"
+      onclick="abrirModalExcluir('<%= msg.id %>')">
+      🗑️ <!-- ícone alternativo, por exemplo: -->
+    </button>
+  </div>
+<% } %>
 
-                                                        <% } %>
+                                                <% } %>
                                         </div>
                                         <div class="recado-conteudo">
                                             <p>
@@ -134,8 +145,7 @@
                                     <% }) %>
                     </div>
 
-                    <% if (tradeData.trade.status !=='cancelled' && tradeData.trade.status !=='completed' &&
-                        tradeData.trade.status !=='pending' && tradeData.trade.status !=='rejected' ) { %>
+                    <% if (tradeData.trade.status !=='cancelled' && tradeData.trade.status !=='completed' && tradeData.trade.status !=='pending' && tradeData.trade.status !=='rejected' ) { %>
                         <form action="/trade/send-message" method="POST" class="form-recado">
                             <input type="hidden" name="tradeId" value="<%= tradeData.trade.id %>">
                             <textarea name="content" rows="3" placeholder="Digite seu recado aqui..."
@@ -143,142 +153,132 @@
                             <button type="submit">Enviar recado</button>
                         </form>
                         <% } else { %>
-                            <p
-                                style="margin-top: 1rem; font-style: italic; font-size: 18px; color: <%= (tradeData.trade.status === 'completed') ? '#198754' : '#D13239' %>;">
-                                Esta trade está
-                                <strong>
-                                    <%= tradeData.trade.status==='completed' ? 'concluída' :
-                                        tradeData.trade.status==='cancelled' ? 'cancelada' :
-                                        tradeData.trade.status==='rejected' ? 'recusada' :
-                                        tradeData.trade.status==='pending' ? 'pendente' :
-                                        tradeData.trade.status==='waiting' ? 'aguardando confirmação' : 'encerrada' %>
-                                </strong>.
-                                Não é possível enviar mensagens.
-                            </p>
+                            <p style="margin-top: 1rem; font-style: italic; font-size:18px; color: <%= tradeData.trade.status === 'completed' ? '#198754;' : '#D13239;' %>;">
+  Esta trade foi <strong><%= tradeData.trade.status === 'cancelled' ? 'cancelada' : 'concluída' %></strong>. Não é possível enviar novas mensagens.
+</p>
                             <% } %>
-
                 </div>
-                </div>
+            </div>
 
-                <!-- Modais -->
-                <!-- Modal Editar -->
-                <div class="modal-editar" id="modalEditar">
-                    <div class="modal-conteudo">
-                        <h3>Editar recado</h3>
-                        <form id="formEditar" method="POST">
-                            <textarea name="content" id="editarContent" rows="4" required></textarea>
-                            <div class="modal-botoes">
-                                <button type="submit">Salvar</button>
-                                <button type="button" onclick="fecharModalEditar()">Retornar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Modal Excluir -->
-                <div class="modal-excluir" id="modalExcluir">
-                    <div class="modal-conteudo">
-                        <h3>Confirmar exclusão</h3>
-                        <p>Tem certeza que deseja excluir este recado?</p>
+            <!-- Modais -->
+            <!-- Modal Editar -->
+            <div class="modal-editar" id="modalEditar">
+                <div class="modal-conteudo">
+                    <h3>Editar recado</h3>
+                    <form id="formEditar" method="POST">
+                        <textarea name="content" id="editarContent" rows="4" required></textarea>
                         <div class="modal-botoes">
-                            <form id="formExcluir" method="POST">
-                                <button type="submit">Excluir</button>
-                                <button type="button" onclick="fecharModalExcluir()">Retornar</button>
-                            </form>
+                            <button type="submit">Salvar</button>
+                            <button type="button" onclick="fecharModalEditar()">Retornar</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
+            </div>
 
-                <!-- Modal Concluir -->
-                <div class="modal-excluir" id="modalConcluir">
-                    <div class="modal-conteudo">
-                        <h3>Concluir trade</h3>
-                        <p>Digite <strong>CONCLUIR</strong> para confirmar a conclusão da trade.</p>
-                        <form action="/trade/confirm/<%= tradeData.trade.id %>" method="POST">
-                            <input type="text" id="inputConcluir" placeholder="Digite aqui" class="input-trade"
-                                oninput="validarConcluir()" required></br></br>
-                            <div class="modal-botoes">
-                                <button type="submit" id="btnConcluir" disabled>Concluir</button>
-                                <button type="button" onclick="fecharModalConcluir()">Fechar</button>
-                            </div>
+            <!-- Modal Excluir -->
+            <div class="modal-excluir" id="modalExcluir">
+                <div class="modal-conteudo">
+                    <h3>Confirmar exclusão</h3>
+                    <p>Tem certeza que deseja excluir este recado?</p>
+                    <div class="modal-botoes">
+                        <form id="formExcluir" method="POST">
+                            <button type="submit">Excluir</button>
+                            <button type="button" onclick="fecharModalExcluir()">Retornar</button>
                         </form>
                     </div>
                 </div>
+            </div>
 
-                <!-- Modal Cancelar -->
-                <div class="modal-excluir" id="modalCancelar">
-                    <div class="modal-conteudo">
-                        <h3 style="color:crimson;">Cancelar trade</h3>
-                        <p>Digite <strong>CANCELAR</strong> para confirmar o cancelamento da trade.</p>
-                        <form action="/trade/cancel/<%= tradeData.trade.id %>" method="POST">
-                            <input type="text" id="inputCancelar" class="input-trade" placeholder="Digite aqui"
-                                oninput="validarCancelar()" required></br></br>
-                            <div class="modal-botoes">
-                                <button type="submit" id="btnCancelar" disabled>Cancelar</button>
-                                <button type="button" onclick="fecharModalCancelar()">Retornar</button>
-                            </div>
-                        </form>
-                    </div>
+            <!-- Modal Concluir -->
+            <div class="modal-excluir" id="modalConcluir">
+                <div class="modal-conteudo">
+                    <h3>Concluir trade</h3>
+                    <p>Digite <strong>CONCLUIR</strong> para confirmar a conclusão da trade.</p>
+                    <form action="/trade/confirm/<%= tradeData.trade.id %>" method="POST">
+                        <input type="text" id="inputConcluir" placeholder="Digite aqui" class="input-trade"
+                            oninput="validarConcluir()" required></br></br>
+                        <div class="modal-botoes">
+                            <button type="submit" id="btnConcluir" disabled>Concluir</button>
+                            <button type="button" onclick="fecharModalConcluir()">Fechar</button>
+                        </div>
+                    </form>
                 </div>
+            </div>
 
-                <!-- Scripts -->
-                <script>
-                    function abrirModalEditar(button) {
-                        const id = button.getAttribute('data-id');
-                        const content = button.getAttribute('data-content');
+            <!-- Modal Cancelar -->
+            <div class="modal-excluir" id="modalCancelar">
+                <div class="modal-conteudo">
+                    <h3 style="color:crimson;">Cancelar trade</h3>
+                    <p>Digite <strong>CANCELAR</strong> para confirmar o cancelamento da trade.</p>
+                    <form action="/trade/cancel/<%= tradeData.trade.id %>" method="POST">
+                        <input type="text" id="inputCancelar" class="input-trade" placeholder="Digite aqui"
+                            oninput="validarCancelar()" required></br></br>
+                        <div class="modal-botoes">
+                            <button type="submit" id="btnCancelar" disabled>Cancelar</button>
+                            <button type="button" onclick="fecharModalCancelar()">Retornar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-                        const form = document.getElementById('formEditar');
-                        form.action = `/trade/edit-message/${id}`;
-                        document.getElementById('editarContent').value = content;
+            <!-- Scripts -->
+            <script>
+                function abrirModalEditar(button) {
+                    const id = button.getAttribute('data-id');
+                    const content = button.getAttribute('data-content');
 
-                        document.getElementById('modalEditar').style.display = 'flex';
-                    }
+                    const form = document.getElementById('formEditar');
+                    form.action = `/trade/edit-message/${id}`;
+                    document.getElementById('editarContent').value = content;
 
-                    function fecharModalEditar() {
-                        document.getElementById('modalEditar').style.display = 'none';
-                    }
+                    document.getElementById('modalEditar').style.display = 'flex';
+                }
 
-                    function abrirModalExcluir(id) {
-                        const form = document.getElementById('formExcluir');
-                        form.action = `/trade/delete-message/${id}`;
-                        document.getElementById('modalExcluir').style.display = 'flex';
-                    }
+                function fecharModalEditar() {
+                    document.getElementById('modalEditar').style.display = 'none';
+                }
 
-                    function fecharModalExcluir() {
-                        document.getElementById('modalExcluir').style.display = 'none';
-                    }
+                function abrirModalExcluir(id) {
+                    const form = document.getElementById('formExcluir');
+                    form.action = `/trade/delete-message/${id}`;
+                    document.getElementById('modalExcluir').style.display = 'flex';
+                }
 
-                    function abrirModalConcluir() {
-                        document.getElementById('modalConcluir').style.display = 'flex';
-                    }
+                function fecharModalExcluir() {
+                    document.getElementById('modalExcluir').style.display = 'none';
+                }
 
-                    function fecharModalConcluir() {
-                        document.getElementById('modalConcluir').style.display = 'none';
-                    }
+                function abrirModalConcluir() {
+                    document.getElementById('modalConcluir').style.display = 'flex';
+                }
 
-                    function abrirModalCancelar() {
-                        document.getElementById('modalCancelar').style.display = 'flex';
-                    }
+                function fecharModalConcluir() {
+                    document.getElementById('modalConcluir').style.display = 'none';
+                }
 
-                    function fecharModalCancelar() {
-                        document.getElementById('modalCancelar').style.display = 'none';
-                    }
+                function abrirModalCancelar() {
+                    document.getElementById('modalCancelar').style.display = 'flex';
+                }
 
-                    function validarConcluir() {
-                        const input = document.getElementById('inputConcluir');
-                        const btn = document.getElementById('btnConcluir');
-                        btn.disabled = input.value.toUpperCase() !== 'CONCLUIR';
-                    }
+                function fecharModalCancelar() {
+                    document.getElementById('modalCancelar').style.display = 'none';
+                }
 
-                    function validarCancelar() {
-                        const input = document.getElementById('inputCancelar');
-                        const btn = document.getElementById('btnCancelar');
-                        btn.disabled = input.value.toUpperCase() !== 'CANCELAR';
-                    }
+                function validarConcluir() {
+                    const input = document.getElementById('inputConcluir');
+                    const btn = document.getElementById('btnConcluir');
+                    btn.disabled = input.value.toUpperCase() !== 'CONCLUIR';
+                }
 
-                    function goBack() {
-                        window.history.back();
-                    }
-                </script>
+                function validarCancelar() {
+                    const input = document.getElementById('inputCancelar');
+                    const btn = document.getElementById('btnCancelar');
+                    btn.disabled = input.value.toUpperCase() !== 'CANCELAR';
+                }
 
-                <% include footer.ejs %>
+                function goBack() {
+                    window.history.back();
+                }
+            </script>
+
+            <% include footer.ejs %>

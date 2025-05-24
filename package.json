@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "init": "nodemon server.js",
-   "start": "node server.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

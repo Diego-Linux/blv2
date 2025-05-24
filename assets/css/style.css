@@ -3348,7 +3348,7 @@ textarea {
     background-color: var(--card-bg);
     color: var(--main-white);
     align-self: flex-start;
-     border:1px solid crimson;
+     border:1px solid orange;
 }
 
 .recado {
