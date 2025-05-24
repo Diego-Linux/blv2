@@ -145,7 +145,7 @@
                                     <% }) %>
                     </div>
 
-                    <% if (tradeData.trade.status !=='cancelled' && tradeData.trade.status !=='completed' ) { %>
+                    <% if (tradeData.trade.status !=='cancelled' && tradeData.trade.status !=='completed' && tradeData.trade.status !=='pending' && tradeData.trade.status !=='rejected' ) { %>
                         <form action="/trade/send-message" method="POST" class="form-recado">
                             <input type="hidden" name="tradeId" value="<%= tradeData.trade.id %>">
                             <textarea name="content" rows="3" placeholder="Digite seu recado aqui..."
