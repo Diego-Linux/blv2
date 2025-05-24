@@ -16,3 +16,4 @@
 - ✅ Sistema de recompensa (estrela) pelas trades concluídas
 - ✅ Resenhas de um livro (usuários podem avaliar e comentar sobre livros)
 - ✅ Notificações
+- ✅ Testes unitários
