@@ -145,18 +145,35 @@
                                     <% }) %>
                     </div>
 
-                    <% if (tradeData.trade.status !=='cancelled' && tradeData.trade.status !=='completed' && tradeData.trade.status !=='pending' && tradeData.trade.status !=='rejected' ) { %>
-                        <form action="/trade/send-message" method="POST" class="form-recado">
-                            <input type="hidden" name="tradeId" value="<%= tradeData.trade.id %>">
-                            <textarea name="content" rows="3" placeholder="Digite seu recado aqui..."
-                                required></textarea>
-                            <button type="submit">Enviar recado</button>
-                        </form>
-                        <% } else { %>
-                            <p style="margin-top: 1rem; font-style: italic; font-size:18px; color: <%= tradeData.trade.status === 'completed' ? '#198754;' : '#D13239;' %>;">
-  Esta trade foi <strong><%= tradeData.trade.status === 'cancelled' ? 'cancelada' : 'concluída' %></strong>. Não é possível enviar novas mensagens.
+                  <% if (tradeData.trade.status === 'progress' || tradeData.trade.status === 'waiting') { %>
+    <form action="/trade/send-message" method="POST" class="form-recado">
+        <input type="hidden" name="tradeId" value="<%= tradeData.trade.id %>">
+        <textarea name="content" rows="3" placeholder="Digite seu recado aqui..." required></textarea>
+        <button type="submit">Enviar recado</button>
+    </form>
+<% } else { %>
+ <p style="margin-top: 1rem; font-style: italic; font-size:18px; color: 
+    <%= 
+        tradeData.trade.status === 'completed' ? '#198754' : 
+        (tradeData.trade.status === 'cancelled' || tradeData.trade.status === 'rejected') ? '#D13239' : 
+        'white' 
+    %>;">
+    Esta trade está 
+    <strong>
+        <%= 
+            tradeData.trade.status === 'completed' ? 'concluída' :
+            tradeData.trade.status === 'cancelled' ? 'cancelada' :
+            tradeData.trade.status === 'rejected' ? 'rejeitada' :
+            tradeData.trade.status === 'pending' ? 'pendente' :
+            tradeData.trade.status === 'waiting' ? 'aguardando confirmação' :
+            'encerrada'
+        %>
+    </strong>.
+    Não é possível enviar mensagens.
 </p>
-                            <% } %>
+
+<% } %>
+
                 </div>
             </div>
 
