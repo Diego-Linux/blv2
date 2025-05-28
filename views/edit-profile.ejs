@@ -1,0 +1,86 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<br />
+ <div class="md-links">
+        <a href="#" style="margin-top:10px;margin-left:30px;" onclick="goBack()">Voltar</a>
+    </div>
+<div class="login-auth-container">
+  <div class="login-auth-left">
+    <h2>Editar Perfil</h2>
+    <form action="/update-profile" method="POST" enctype="multipart/form-data">
+      <div class="login-input-wrapper avatar-wrapper">
+        <img id="avatar" src="<%= user.image || '' %>" alt="Avatar" class="avatar-preview <%= user.image ? '' : 'hidden' %>">
+      </div>
+
+      <div class="login-input-wrapper">
+        <label for="image" style="color: white;">Selecionar Imagem:</label>
+        <input type="file" id="image" name="image" accept="image/*" style="color: white;">
+      </div>
+
+      <div class="login-input-wrapper">
+        <input type="text" id="name" name="name" value="<%= user.name %>" placeholder="Seu nome">
+        <i class="fas fa-user"></i>
+      </div>
+
+      <div class="login-input-wrapper">
+        <input type="email" id="email" name="email" value="<%= user.email %>" placeholder="Seu email">
+        <i class="fas fa-envelope"></i>
+      </div>
+
+      <div class="login-input-wrapper">
+        <button class="login-btn-submit" type="submit">Atualizar</button>
+      </div>
+    </form>
+
+    <% if (authError) { %>
+      <script>toastr.error(`<%= authError %>`);</script>
+    <% } %>
+    <% if (success) { %>
+      <script>toastr.success(`<%= success %>`);</script>
+    <% } %>
+  </div>
+</div>
+
+<style>
+  .avatar-wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+    height: 100px;
+  }
+
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    background-color: #ccc;
+    transition: opacity 0.3s ease;
+  }
+
+  .avatar-preview.hidden {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  const imageInput = document.getElementById('image');
+  const avatar = document.getElementById('avatar');
+
+  imageInput.addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        avatar.src = e.target.result;
+        avatar.classList.remove('hidden');
+      }
+      reader.readAsDataURL(file);
+    } else {
+      avatar.src = "";
+      avatar.classList.add('hidden');
+    }
+  });
+</script>
+
+<% include footer.ejs %>

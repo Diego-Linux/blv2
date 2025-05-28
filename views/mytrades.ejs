@@ -1,0 +1,142 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<% function formatDate(dateString) {
+    const date = new Date(dateString);
+    date.setHours(date.getHours() - 3); // Corrige para UTC-3 (horário de Brasília)
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(2);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month}/${year} às ${hours}:${minutes}`;
+} %>
+
+
+<div class="card-mytrade-container">
+    <h3 class="card-mytrade-title">Minhas trades</h3>
+    <% trades.forEach(trade => {
+        const alreadyConfirmed = 
+            (req.session.userId === trade.sender_id && trade.trade.confirmed_by_sender) ||
+            (req.session.userId === trade.receiver_id && trade.trade.confirmed_by_receiver);
+    %>
+    <div class="card-mytrade-card 
+        <%= trade.trade.status === 'cancelled' ? 'cancelled' : 
+            trade.trade.status === 'completed' ? 'completed' : 'active' %>">
+
+        <div class="card-mytrade-card-content">
+            <p>
+  <a href="/trade/details/<%= trade.id %>" class="card-mytrade-link details">
+    Clique aqui para os detalhes da trade
+  </a>
+</p>
+
+          <p><strong>Solicitado por:</strong>
+  <a href="/user/<%= trade.sender.id %>">
+    <%= trade.sender.id === req.session.userId ? 'Você' : trade.sender.name %>
+  </a>
+</p>
+<p><strong>Para:</strong>
+  <a href="/user/<%= trade.receiver.id %>">
+    <%= trade.receiver.name %>
+  </a>
+</p>
+
+            <p><strong>Livro oferecido:</strong> 
+                <a href="/books/<%= trade.booksender_id %>" class="card-mytrade-link">
+                    <%= trade.booksender.name %>
+                </a>
+            </p>
+            <p><strong>Livro requisitado:</strong> 
+                <a href="/books/<%= trade.bookreceiver_id %>" class="card-mytrade-link">
+                    <%= trade.bookreceiver.name %>
+                </a>
+            </p>
+            <p><strong>Código da Trade:</strong> <%= trade.id %></p>
+            <p><strong>Status:</strong> <%= trade.trade.status %></p>
+            <p><strong>Data de criação da trade:</strong> <%= formatDate(trade.createdAt) %></p>
+
+            <!-- Ações -->
+            <!-- <div class="card-mytrade-actions">
+                <% if ((trade.trade.status === 'progress' || trade.trade.status === 'waiting') && !alreadyConfirmed) { %>
+                    <button class="card-mytrade-btn-confirm"
+                        onclick="openModal('modal-accept-<%= trade.id %>')">Concluir Trade</button>
+                    <button class="card-mytrade-btn-cancel"
+                        onclick="openModal('modal-delete-<%= trade.id %>')">Cancelar Trade</button>
+                <% } else if (alreadyConfirmed && trade.trade.status !== 'completed') { %>
+                    <p class="text-warning">Você já confirmou esta troca. Aguarde o outro usuário.</p>
+                <% } else if (trade.trade.status === 'completed') { %>
+                    <p class="text-success">Troca finalizada com sucesso!</p>
+                <% } else if (trade.trade.status === 'cancelled') { %>
+                    <p class="text-danger">Troca cancelada.</p>
+                <% } %>
+            </div> -->
+        </div>
+        <div class="card-mytrade-images">
+            <img src="<%= trade.booksender.image %>" alt="Imagem de <%= trade.booksender.name %>" class="card-mytrade-image" />
+            <img src="<%= trade.bookreceiver.image %>" alt="Imagem de <%= trade.bookreceiver.name %>" class="card-mytrade-image" />
+        </div>
+    </div>
+
+    <!-- Modal de concluir -->
+    <div class="card-mytrade-modal" id="modal-accept-<%= trade.id %>" style="display: none;">
+        <div class="card-mytrade-modal-content">
+            <span class="card-mytrade-close-modal">&times;</span>
+            <h2 style="color:white;">Concluir a trade?</h2>
+            <div class="card-mytrade-modal-buttons">
+                <form action="/trade/confirm/<%= trade.id %>" method="POST">
+                    <button type="submit" class="card-mytrade-btn-confirm">Sim</button>
+                </form>
+                <button class="card-mytrade-btn-cancel"
+                    onclick="closeModal('modal-accept-<%= trade.id %>')">Não</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de cancelar -->
+    <div class="card-mytrade-modal" id="modal-delete-<%= trade.id %>" style="display: none;">
+        <div class="card-mytrade-modal-content">
+            <span class="card-mytrade-close-modal">&times;</span>
+            <h2 style="color:white;">Cancelar a trade?</h2>
+            <div class="card-mytrade-modal-buttons">
+                <form action="/trade/cancel/<%= trade.id %>" method="POST">
+                    <button type="submit" class="card-mytrade-btn-confirm">Sim</button>
+                </form>
+                <button class="card-mytrade-btn-cancel"
+                    onclick="closeModal('modal-delete-<%= trade.id %>')">Não</button>
+            </div>
+        </div>
+    </div>
+    <% }); %>
+</div>
+
+<% include footer.ejs %>
+
+<script>
+    const openModal = (modalId) => {
+        document.getElementById(modalId).style.display = 'block';
+    };
+
+    const closeModal = (modalId) => {
+        document.getElementById(modalId).style.display = 'none';
+    };
+
+    document.querySelectorAll('.card-mytrade-close-modal').forEach(btn => {
+        btn.addEventListener('click', function () {
+            closeModal(this.closest('.card-mytrade-modal').id);
+        });
+    });
+
+    document.querySelectorAll('.card-mytrade-btn-cancel').forEach(btn => {
+        btn.addEventListener('click', function () {
+            closeModal(this.closest('.card-mytrade-modal').id);
+        });
+    });
+
+    window.onclick = function (event) {
+        if (event.target.classList.contains('card-mytrade-modal')) {
+            closeModal(event.target.id);
+        }
+    };
+</script>

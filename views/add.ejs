@@ -1,0 +1,70 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<div class="bookadd-container">
+  <div class="bookadd-card">
+    <h2 class="bookadd-title">📚 Adicionar Livro</h2>
+
+    <% if(bookAdded) { %>
+      <script>toastr.success(`Agora aguarde a aprovação de um administrador`)</script>
+    <% } %>
+
+    <form action="/books/add" method="POST" enctype="multipart/form-data" class="bookadd-form">
+
+      <div class="bookadd-grid">
+        <!-- Título -->
+        <div class="bookadd-field">
+          <label for="name">Título do Livro</label>
+          <div class="bookadd-input-wrapper">
+            <i class="fas fa-heading"></i>
+            <input type="text" id="name" name="name" placeholder="Título do livro">
+          </div>
+          <% let nameError = validationErrors.find(err => err.param === 'name') %>
+          <% if (nameError) { %>
+            <script>toastr.error(`<%= nameError.msg %>`)</script>
+          <% } %>
+        </div>
+
+        <!-- Autor -->
+        <div class="bookadd-field">
+          <label for="author">Autor</label>
+          <div class="bookadd-input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" id="author" name="author" placeholder="Autor do livro">
+          </div>
+        </div>
+
+        <!-- Categoria -->
+        <div class="bookadd-field">
+          <label for="category">Categoria</label>
+          <select  class="search-select" id="category" name="category">
+            <option value="Educação">Educação</option>
+            <option value="Ficção">Ficção</option>
+            <option value="Política">Política</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Descrição (linha única) -->
+      <div class="bookadd-field">
+        <label for="description">Descrição</label>
+        <div class="bookadd-input-wrapper">
+          <i class="fas fa-file"></i>
+          <textarea id="description" name="description" placeholder="Digite uma descrição"></textarea>
+        </div>
+      </div>
+
+      <!-- Imagem (linha única) -->
+      <div class="bookadd-field">
+        <label for="image">Imagem do Livro</label>
+        <input type="file" id="image" name="image">
+      </div>
+
+      <div class="bookadd-submit">
+        <button type="submit">Adicionar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% include footer.ejs %>

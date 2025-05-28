@@ -1,0 +1,112 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+ <% if (validationErrors && validationErrors.length > 0) { %>
+          <script>toastr.error(` <%= validationErrors[0] %>`);</script>
+
+  </div>
+<% } %>
+
+<div class="trade-container">
+    <div class="my-books">
+        <div>
+            <a href="#" style="color:#D13239; text-decoration:underline" onclick="goBack()">Voltar</a>
+        </div>
+        <br />
+
+        <div>
+            <p>
+                <strong>Importante:</strong>
+                Ao iniciar um processo de troca de livros, é importante estar ciente de que existe um prazo para
+                cancelamento antes da aceitação pelo outro usuário. Após a aceitação, só é possível cancelar a troca
+                através de um pedido ao administrador, acarretando na perda de créditos. Essa medida não apenas
+                afeta a sua experiência, mas também prejudica a sua reputação no sistema de trocas. Portanto, é
+                fundamental tomar decisões cuidadosas durante todo o processo para evitar problemas futuros.
+            </p>
+        </div>
+        <br />
+
+        <% if (myBooks.length > 0) { %>
+            <label for="booksender_id" style="color:white; font-weight:bold;">
+                Selecione seu livro para troca:
+            </label>
+            <select id="selectBook" style="border: 1px solid rgba(255, 255, 255, 0.185);">
+                <% myBooks.forEach(myBook => { %>
+                    <option value="<%= myBook.id %>"><%= myBook.name %></option>
+                <% }) %>
+            </select>
+            <br /><br />
+            <button class="btn-confirm" id="openModalBtn">Solicitar</button>
+        <% } else { %>
+            <p style="color:orange; font-style:italic;">
+                Você não possui livros disponíveis para solicitar uma troca.
+            </p>
+        <% } %>
+    </div>
+
+    <div class="other-user-book">
+        <div class="other-user-book-details">
+            <h3><%= tradeBook.name %></h3><br />
+            <p>Proprietário: <%= tradeBook.user.name %></p><br />
+            <div class="book-soli-image">
+                <img src="<%= tradeBook.image %>" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h2 style="color:white;">Deseja confirmar a solicitação?</h2>
+        <div class="modal-buttons">
+            <form id="solicitationForm" class="modal-form-buttons" action="/trade/new" method="POST">
+                <input type="hidden" name="receiver_id" value="<%= tradeBook.user.id %>">
+                <input type="hidden" name="sender_id" value="<%= req.session.userId %>">
+                <input type="hidden" name="bookreceiver_id" value="<%= tradeBook.id %>">
+                <input type="hidden" id="booksender_id" name="booksender_id" value="">
+                <button type="submit" class="btn-confirm" id="confirmRequestBtn">Confirmar</button>
+            </form>
+            <div>
+                <button id="cancelRequestBtn" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% include footer.ejs %>
+
+<script>
+    const selectBook = document.getElementById('selectBook');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const booksenderInput = document.getElementById('booksender_id');
+
+    if (openModalBtn && selectBook && booksenderInput) {
+        openModalBtn.addEventListener('click', function () {
+            const selectedValue = selectBook.value;
+            booksenderInput.value = selectedValue;
+        });
+
+        function openModal() {
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function confirmSolicitation() {
+            document.getElementById('solicitationForm').submit();
+            closeModal();
+        }
+
+        function cancelSolicitation() {
+            closeModal();
+        }
+
+        openModalBtn.addEventListener('click', openModal);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('confirmRequestBtn').addEventListener('click', confirmSolicitation);
+        document.getElementById('cancelRequestBtn').addEventListener('click', cancelSolicitation);
+    }
+</script>

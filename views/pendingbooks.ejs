@@ -1,0 +1,139 @@
+<% include header.ejs %>
+  <% include font-control.ejs %>
+    <div class="bookrequests-main">
+      <h2 class="bookrequests-title">Solicitações de novos livros</h2>
+      <div class="div-pagination pending">
+        <ul class="pagination pending">
+          <% for (let i=1; i <=totalPages; i++) { %>
+            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+              <a class="page-link" href="/books/admin/book-request?page=<%= i %>">
+                <%= i %>
+              </a>
+            </li>
+            <% } %>
+        </ul>
+      </div>
+
+      <div class="bookrequests-cards">
+        <% pendingBooks.forEach(book=> { %>
+          <div class="bookrequests-card">
+            <div class="bookrequests-card-img">
+              <img src="<%= book.image %>" alt="Capa do livro">
+            </div>
+            <div class="bookrequests-card-info">
+              <p><strong>Solicitante:</strong> <a href="/user/<%= book.user.id %>"><%= book.user.name%></a></p>
+              <p><strong>Livro:</strong> <a href="/books/<%= book.id %>">
+                  <%= book.name %>
+                </a></p>
+              <p><strong>Código:</strong>
+                <%= book.id %>
+              </p>
+              <p><strong>Categoria:</strong>
+                <%= book.category %>
+              </p>
+              <div class="bookrequests-card-actions">
+                <button class="bookrequests-btn-accept" data-id="<%= book.id %>">Aceitar</button>
+                <button class="bookrequests-btn-reject" data-id="<%= book.id %>">Recusar</button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+      </div>
+    </div>
+
+    <% include footer.ejs %>
+
+      <!-- Modal de aceitar -->
+      <div class="modal" id="modal-accept">
+        <div class="modal-content">
+          <span class="close-modal" id="closeModalBtn">&times;</span>
+          <h2 style="color:white;">Aceitar solicitação?</h2>
+          <div class="modal-buttons">
+            <form id="acceptBook" class="modal-form-buttons" method="POST">
+              <button type="submit" class="btn-confirm" id="confirmAcceptBtn">Confirmar</button>
+            </form>
+            <div>
+              <button id="cancelAcceptBtn" class="btn-cancel">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Modal de recusar -->
+      <div class="modal" id="modal-delete">
+        <div class="modal-content">
+          <span class="close-modal" id="closeModalBtn">&times;</span>
+          <h2 style="color:white;">Recusar solicitação?</h2>
+          <div class="modal-buttons">
+            <form id="rejectBook" class="modal-form-buttons" method="POST">
+              <button type="submit" class="btn-confirm" id="confirmRequestBtn">Confirmar</button>
+            </form>
+            <div>
+              <button id="cancelRequestBtn" class="btn-cancel">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <script>
+        const acceptButtons = document.querySelectorAll('.bookrequests-btn-accept');
+        acceptButtons.forEach(button => {
+          button.addEventListener('click', function () {
+            const modal = document.getElementById('modal-accept');
+            modal.style.display = 'block';
+            const form = document.getElementById('acceptBook');
+            form.action = '/books/admin/accept-book/' + this.dataset.id;
+          });
+        });
+
+        const removeButtons = document.querySelectorAll('.bookrequests-btn-reject');
+        removeButtons.forEach(button => {
+          button.addEventListener('click', function () {
+            const modal = document.getElementById('modal-delete');
+            modal.style.display = 'block';
+            const form = document.getElementById('rejectBook');
+            form.action = '/books/admin/reject-book/' + this.dataset.id;
+          });
+        });
+
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        closeModalBtns.forEach(btn => {
+          btn.addEventListener('click', function () {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => modal.style.display = 'none');
+          });
+        });
+
+        document.getElementById('cancelAcceptBtn').addEventListener('click', function () {
+          document.getElementById('modal-accept').style.display = 'none';
+        });
+
+        const cancelRequestBtns = document.querySelectorAll('.btn-cancel');
+        cancelRequestBtns.forEach(button => {
+          button.addEventListener('click', function () {
+            document.getElementById('modal-delete').style.display = 'none';
+          });
+        });
+
+        document.getElementById('confirmRequestBtn').addEventListener('click', function () {
+          const form = document.getElementById('deleteTrade');
+          if (form) form.submit();
+          document.getElementById('modal-delete').style.display = 'none';
+        });
+
+        document.getElementById('confirmAcceptBtn').addEventListener('click', function () {
+          const form = document.getElementById('acceptTrade');
+          if (form) form.submit();
+          document.getElementById('modal-accept').style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+          const modals = document.querySelectorAll('.modal');
+          modals.forEach(modal => {
+            if (event.target === modal) modal.style.display = 'none';
+          });
+        });
+      </script>

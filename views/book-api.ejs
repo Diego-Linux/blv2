@@ -1,0 +1,42 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<div class="book-api-container">
+  <div class="book-api-search-bar">
+    <form action="/books/book-details" method="GET" class="book-api-search-form">
+      <input type="text" name="title" placeholder="Digite o título do livro..." class="book-api-input" value="<%= title || '' %>" required>
+      <button type="submit" class="book-api-button">Buscar Livro</button>
+    </form>
+  </div>
+
+<p class="book-api-info-text">
+  Use esta ferramenta para consultar informações básicas sobre o livro, como autor, número de páginas, data de publicação, editora e outros dados essenciais. Esta busca serve somente para visualização rápida, não sendo possível clicar para ver mais detalhes.
+</p>
+
+
+  <% if (books && books.length) { %>
+    <ul class="book-api-results">
+      <% books.forEach(function(book) { %>
+        <li class="book-api-card">
+          <a href="#" class="book-api-link">
+            <div class="book-api-cover">
+              <img src="<%= book.volumeInfo.imageLinks?.thumbnail || 'default.jpg' %>" alt="Capa de <%= book.volumeInfo.title %>">
+            </div>
+            <div class="book-api-details">
+              <p><strong>Título:</strong> <%= book.volumeInfo.title %></p>
+              <p><strong>Autor:</strong> <%= book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Autor Desconhecido' %></p>
+              <p><strong>Páginas:</strong> <%= book.volumeInfo.pageCount || 'N/A' %></p>
+              <p><strong>Editora:</strong> <%= book.volumeInfo.publisher || 'Desconhecida' %></p>
+              <p><strong>Data de publicação:</strong> <%= book.volumeInfo.publishedDate || 'N/A' %></p>
+              <p><strong>Categorias:</strong> <%= book.volumeInfo.categories ? book.volumeInfo.categories.join(', ') : 'Nenhuma categoria disponível' %></p>
+            </div>
+          </a>
+        </li>
+      <% }); %>
+    </ul>
+  <% } else if (title) { %>
+    <p class="book-api-not-found">Nenhum livro encontrado com esse título.</p>
+  <% } %>
+</div>
+
+<% include footer.ejs %>

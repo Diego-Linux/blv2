@@ -1,0 +1,116 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<% function formatDate(dateString) {
+    const d = new Date(dateString);
+    return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'2-digit'});
+} %>
+
+<% if (validationErrors && validationErrors.length) { %>
+    <div class="toast-container">
+        <% validationErrors.forEach(err => { %>
+            <script>toastr.error(` <%= validationErrors[0] %>`);</script>
+        <% }) %>
+    </div>
+<% } %>
+
+<div class="detail-container">
+    <div class="breadcrumb-links">
+        <p> <a href="#" onclick="goBack()">Voltar</a>Livros &gt; Categorias &gt; <%= book.category %></p>
+    </div>
+    <div class="detail-main">
+        <!-- Imagem Principal + Miniaturas -->
+       <div class="detail-image">
+  <% if (book.image) { %>
+    <img id="mainImage" class="main-image" src="<%= book.image %>" alt="Capa do livro <%= book.name %>">
+    <div class="thumbnails-container">
+      <% [book.image].slice(0,4).forEach((img, i) => { %>
+        <img src="<%= img %>" alt="Miniatura <%= i+1 %>" class="thumbnail-img" onclick="setMainImage('<%= img %>')" />
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p>Imagem indisponível</p>
+  <% } %>
+</div>
+
+        <!-- Info e ações -->
+        <div class="detail-info">
+            <h2 class="detail-title"><%= book.name %></h2>
+              <div class="actions-row">
+                <button class="btn-review" onclick="location.href='/books/titles?search=<%= encodeURIComponent(book.name) %>'">Ver Resenhas</button>
+
+                <% if (isUser && book.user.id === isUser) { %>
+                    <button class="btn-remove" id="openModalBtn">Remover</button>
+                <% } %>
+
+                <% if (isUser && book.user.id !== isUser && !isAdmin && myBooks && myBooks.length) { %>
+                    <form action="/trade/new" method="POST" class="offer-form-inline">
+                        <input type="hidden" name="receiver_id" value="<%= book.user.id %>">
+                        <input type="hidden" name="bookreceiver_id" value="<%= book.id %>">
+
+                        <select name="booksender_id" required class="search-select book-details">
+                            <% myBooks.forEach(b => { %>
+                                <option value="<%= b.id %>"><%= b.name %> - <%= b.author %></option>
+                            <% }) %>
+                        </select>
+
+                        <button type="submit" class="btn-submit">Enviar Solicitação</button>
+                    </form>
+                <% } %>
+            </div>
+            <p class="detail-description"><%= book.description %></p>
+
+            <div class="detail-properties">
+                <p><strong>Título:</strong> <%= book.name %></p>
+                <p><strong>Categoria:</strong> <%= book.category %></p>
+                <p><strong>Proprietário:</strong> 
+                    <a href="/user/<%= book.user.id %>" class="owner-link"><%= book.user.name %></a>
+                </p>
+                <p><strong>Status:</strong> <%= book.status %></p>
+                <p><strong>Autor:</strong> <%= book.author %></p>
+                <p><strong>Adicionado em:</strong> <%= formatDate(book.createdAt) %></p>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Modal Remover -->
+<!-- Modal padronizado para remover livro -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h2 style="color:white;">Deseja remover este livro?</h2>
+        <div class="modal-buttons">
+            <% if (book.user.id === req.session.userId || req.session.isAdmin) { %>
+                <form action="/books/remove/<%= book.id %>" method="POST" class="modal-form-buttons">
+                    <button type="submit" class="btn-confirm" id="confirmRequestBtn">Confirmar</button>
+                </form>
+            <% } %>
+            <div>
+                <button type="button" id="cancelRequestBtn" class="btn-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<% include footer.ejs %>
+
+<script>
+    function setMainImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+
+    const modal = document.getElementById('modal');
+    document.getElementById('openModalBtn')?.addEventListener('click', () => {
+        modal.style.display = 'block';
+    });
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+    document.getElementById('cancelRequestBtn')?.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+</script>

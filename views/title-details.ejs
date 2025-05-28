@@ -1,0 +1,121 @@
+<% include header.ejs %>
+
+<div class="title-detail-container">
+  <div class="md-links">
+    <a href="#" onclick="goBack()">Voltar</a>
+  </div><br/>
+
+  <div class="title-main-info">
+    <div class="title-image">
+      <img src="<%= title.image %>" alt="Capa do livro <%= title.name %>" />
+      
+      <div class="rating-section">
+          <a href="#comments-section" class="btn-see-comments">Ver Resenhas ▼</a>
+      </div>
+    </div>
+
+    <div class="title-details">
+      <h1><%= title.name %></h1>
+      <p><strong>Autor:</strong> <%= title.author || 'Não informado' %></p>
+      <p><strong>Descrição:</strong></p>
+      <p><%= title.description || 'Sem descrição disponível.' %></p>
+
+      <div class="current-rating" style="margin-top: 20px;">
+        <div class="rating-distribution" style="margin-top: 15px;">
+  <h4 style="color: white;">Distribuição das avaliações:</h4>
+  <% for(let i = 5; i >= 1; i--) { %>
+    <div class="distribution-row" style="display:flex; align-items:center; margin-top:10px;margin-bottom: 5px;">
+      <span style="color: gold; margin-right: 8px;"><%= i %> estrela<%= i > 1 ? 's' : '' %>:</span>
+      <div class="progress-bar" style="background: #444; width: 200px; height: 15px; border-radius: 7px; overflow: hidden; margin-right: 8px;">
+        <div style="width: <%= title.distributionPercent[i] %>%; background: gold; height: 100%;"></div>
+      </div>
+      <span style="color: white;"><%= title.distributionPercent[i] %>%</span>
+    </div>
+  <% } %>
+  </div>
+
+        <% if (title.averageRating !== null && title.averageRating !== undefined) { %>
+          <div class="stars-display" aria-label="Avaliação média do livro">
+            <% 
+              const fullStars = Math.floor(title.averageRating);
+              const halfStar = (title.averageRating % 1) >= 0.5;
+            %>
+            <% for (let i = 0; i < fullStars; i++) { %>
+              <span class="star full" title="Estrela cheia">★</span>
+            <% } %>
+            <% if (halfStar) { %>
+              <span class="star half" title="Meia estrela">★</span>
+            <% } %>
+            <% for (let i = fullStars + (halfStar ? 1 : 0); i < 5; i++) { %>
+              <span class="star empty" title="Estrela vazia">☆</span>
+            <% } %>
+            <span class="rating-number" style="color:#fff;">(<%= title.averageRating.toFixed(1) %>/5.0)</span>
+          </div>
+        </br>
+         <p style="font-size:15px; margin-top:10px;"><%= title.ratingsCount %> usuários já avaliaram este livro.</p>
+        <% } else { %>
+          <p style="color:white;">Sem avaliações ainda.</p>
+        <% } %>
+      </div>
+
+      <% if (isUser) { %>
+        <div class="rating-form" style="margin-top: 20px;">
+          <form action="/books/titles/<%= title.id %>/rate" method="POST" aria-label="Formulário de avaliação do livro">
+            <fieldset style="border:none;">
+              <legend style="color:white;">Envie sua avaliação:</legend>
+              <div class="rating-stars" role="radiogroup" aria-label="Escolha uma nota de 1 a 5 estrelas">
+  <% for (let i = 5; i >= 1; i--) { %>
+    <input type="radio" id="rate-star-<%= i %>" name="rating" value="<%= i %>" required />
+    <label for="rate-star-<%= i %>" title="<%= i %> estrela<%= i > 1 ? 's' : '' %>">★</label>
+  <% } %>
+</div>
+
+            </fieldset>
+            <button type="submit" class="available" style="margin-top: 10px;">Enviar avaliação</button>
+          </form>
+        </div>
+      <% } else { %>
+        <p class="login-info" style="color: lightgray; margin-top: 20px;">
+          Faça <a href="/login">login</a> para avaliar este livro.
+        </p>
+      <% } %>
+    </div>
+  </div>
+
+  <div id="comments-section" class="title-rating-comments" style="margin-top: 40px;">
+    <h3>Resenhas dos usuários:</h3>
+    
+    <% if (title.comments && title.comments.length > 0) { %>
+      <ul>
+        <% title.comments.forEach(comment => { %>
+          <li class="user-resenha">
+            <img class="comment-user-image" src="<%= comment.user.image || '/images/default-user.png' %>" alt="Foto de <%= comment.user.name %>">
+            <div class="comment-content">
+              <a href="/user/<%= comment.user.id %>"><%= comment.user.name %></a>
+              <p><%= comment.text %></p>
+              <small><%= new Date(comment.createdAt).toLocaleDateString() %></small>
+            </div>
+            <% if (isUser && req.session.userId === comment.userId) { %>
+              <form action="/books/titles/<%= title.id %>/comments/<%= comment.id %>/delete" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este comentário?')">
+                <button type="submit" title="Deletar comentário" aria-label="Deletar comentário">🗑️</button>
+              </form>
+            <% } %>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p style="color:white;">Sem resenhas ainda.</p>
+    <% } %>
+
+    <% if (isUser) { %>
+      <form action="/books/titles/<%= title.id %>/comments" method="POST" style="margin-top: 20px;">
+        <textarea name="text" rows="4" placeholder="Escreva aqui..." required style="width:100%; margin-top: 10px;"></textarea>
+        <button type="submit" style="margin-top: 10px;">Enviar resenha</button>
+      </form>
+    <% } else { %>
+      <p style="color:lightgray; margin-top: 20px;">Faça login para fazer uma resenha.</p>
+    <% } %>
+  </div>
+</div>
+
+<% include footer.ejs %>

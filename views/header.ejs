@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca livre</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body class="fade">
+  <nav>
+    <div class="logo">
+      <img src="https://res.cloudinary.com/dyrynber4/image/upload/v1747781964/relogo_vhcsyn.png" alt="Logo"
+        style="height: 50px; width: auto;">
+    </div>
+    <ul id="menuList">
+      <% if (req.session.userId) { %>
+        <div class="notification-icon" onclick="toggleNotifications()">
+          <i class="fas fa-bell"></i>
+          <span class="notification-count">
+            <%= req.session.notificationCount || 0 %>
+          </span>
+          <ul id="notificationMenu" class="submenu notif" style="max-height: 300px; overflow-y: auto;">
+            <% if (req.session.notifications && req.session.notifications.length> 0) { %>
+              <% req.session.notifications.forEach(notification=> { %>
+                <li style="display: flex; flex-direction: column; padding: 8px 12px;">
+                  <form action="/notifications/read/<%= notification.id %>" method="POST" style="display:inline;">
+                    <% let redirectTo='/' ; const msg=notification.message.toLowerCase(); if (msg.includes('recebeu') &&
+                      msg.includes('estrela')) { redirectTo='/mybooks' ; } else if (msg.includes('recebeu')) {
+                      redirectTo='/trade/reqlist' ; } else if ( msg.includes('aceitou') || msg.includes('foi aceita') ||
+                      msg.includes('cancelada') || msg.includes('confirmou') || msg.includes('concluída') ||
+                      msg.includes('sucesso') || msg.includes('iniciaram') ) { redirectTo='/trade/mytrades' ; } %>
+
+                      <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
+                      <button type="submit" class="notification-btn">
+                        <%= notification.message %>
+                      </button>
+                  </form>
+                  <small style="font-size: 15px; color: #888;">
+                    <%= new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' , timeStyle: 'short' ,
+                      timeZone: 'America/Sao_Paulo' }).format(new Date(notification.createdAt)) %>
+                  </small>
+                </li>
+                <% }) %>
+                  <% } else { %>
+                    <li class="no-notification">
+                      <i class="fas fa-inbox"></i> Sem novas notificações
+                    </li>
+                    <% } %>
+          </ul>
+        </div>
+        <% } %>
+
+          <li><a href="/"><i class="fas fa-home"></i> Início</a></li>
+
+          <% if (req.session.userId) { %>
+            <li><a href="#"><i class="fas fa-book"></i> Livros <i class="fas fa-chevron-down"></i></a>
+              <ul class="submenu">
+                <li><a href="/books"><i class="fas fa-book-open"></i>Disponíveis</a></li>
+                <li><a href="/mybooks"><i class="fas fa-book"></i> Minha estante</a></li>
+                <li><a href="/books/add"><i class="fas fa-plus-circle"></i> Adicionar Livro</a></li>
+                <li><a href="/books/book-details"><i class="fas fa-search"></i> Consultar livro</a></li>
+                <li><a href="/books/titles"><i class="fas fa-star"></i> Resenhas</a></li>
+              </ul>
+            </li>
+
+            <% if (req.session.isAdmin) { %>
+              <li><a href="#"><i class="fas fa-tools"></i> Administrador <i class="fas fa-chevron-down"></i></a>
+                <ul class="submenu">
+                  <li><a href="/books/admin/book-request"><i class="fas fa-clipboard-check"></i> Pedidos (<%=
+                        req.session.pending %>)</a></li>
+                  <li><a href="/books/titles/add"><i class="fas fa-pen"></i> Nova resenha</a></li>
+                </ul>
+              </li>
+              <% } %>
+
+                <li><a href="#"><i class="fas fa-exchange-alt"></i> Trades <i class="fas fa-chevron-down"></i></a>
+                  <ul class="submenu">
+                    <li><a href="/trade/reqlist"><i class="fas fa-inbox"></i> Solicitações recebidas</a></li>
+                    <li><a href="/trade/myrequests"><i class="fas fa-paper-plane"></i> Solicitações enviadas</a></li>
+                    <li><a href="/trade/mytrades"><i class="fas fa-list"></i> Minhas Trades</a></li>
+                  </ul>
+                </li>
+
+                <li>
+                  <a href="#">
+                    <% if (req.session.image) { %>
+                      <img src="<%= req.session.image %>" alt="" class="user-photo-inline" />
+                      <% } else { %>
+                        <i class="fas fa-user"></i>
+                        <% } %>
+                          <i class="fas fa-chevron-down"></i>
+                  </a>
+                  <ul class="submenu avatar">
+                    <li><a href="/edit-profile"><i class="fas fa-user-cog"></i></a></li>
+                    <li><a href="/logout"><i class="fas fa-sign-out-alt"></i></a></li>
+                  </ul>
+                </li>
+                <% } else { %>
+                  <li><a href="/login"><i class="fas fa-sign-in-alt"></i> Entrar</a></li>
+                  <% } %>
+    </ul>
+
+    <div class="menu-icon">
+      <i class="fas fa-bars" onclick="toggleMenu()"></i>
+    </div>
+  </nav>
+</body>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuItems = document.querySelectorAll('nav ul li a');
+    menuItems.forEach(item => {
+      item.addEventListener('click', function (e) {
+        const submenu = this.nextElementSibling;
+        if (submenu && submenu.classList.contains('submenu')) {
+          e.preventDefault();
+          document.querySelectorAll('nav ul li ul.submenu').forEach(s => {
+            if (s !== submenu) s.style.display = 'none';
+          });
+          submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+    });
+  });
+
+  function toggleNotifications() {
+    const notificationMenu = document.getElementById('notificationMenu');
+    document.querySelectorAll('nav ul.submenu').forEach(submenu => {
+      if (submenu !== notificationMenu) submenu.style.display = 'none';
+    });
+    notificationMenu.style.display = notificationMenu.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
+
+</html>

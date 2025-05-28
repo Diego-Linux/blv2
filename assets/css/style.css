@@ -1,0 +1,4063 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+:root {
+    --main-red: #D13239;
+    --main-green: #198754;
+    --main-bg: #2a2a2a;
+    --card-bg: #1e1e1e;
+    --main-orange: #fd7e14;
+    --bg-header: #262626;
+    --main-white: #FFFFFF;
+    --err-toastify: var(--main-red);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: 'Rubik', Arial, Helvetica, sans-serif;
+}
+
+/* Estilos gerais do painel de controle */
+.font-control {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    position: fixed;
+    top: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.479);
+    left: 4px;
+    background-color: #0c0b0b;
+    border-radius: 6px;
+    padding: 10px;
+    z-index: 1000;
+    width: 70px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Remove o box-shadow dos toasts */
+#toast-container>.toast {
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+#toast-container>.toast-success {
+    background-color: #43a047 !important;
+    /* cor mais viva que o padrão */
+    color: white !important;
+    opacity: 1 !important;
+    filter: brightness(1.1) !important;
+    /* deixa mais "brilhante" */
+}
+
+/* Ícones dentro do painel */
+.font-control i {
+    color: #fff;
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+/* Quando a classe 'active' for adicionada, mostra o painel */
+.font-control.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Estilo do botão de controle (engrenagem) */
+.control-toggle {
+    position: fixed;
+    top: 65px;
+    left: 10px;
+    background: none;
+    color: var(--main-white);
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    z-index: 1001;
+    transition: background-color 0.3s, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efeito de hover para o botão de controle */
+.control-toggle:hover {
+    transform: scale(1.05);
+    /* Levemente maior no hover */
+}
+
+/* Estilo dos botões dentro do painel */
+.font-control button {
+    background: var(--main-red);
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 8px 8px;
+    text-align: center;
+    margin: 3px 0;
+    border-radius: 4px;
+    transition: background-color 0.3s, transform 0.2s ease;
+    width: 100%;
+}
+
+/* Efeito de hover para os botões */
+.font-control button:hover {
+    transform: translateY(-2px);
+    /* Levanta suavemente */
+}
+
+
+/* Responsividade para botões e painel */
+@media (max-width: 768px) {
+    .font-control {
+        width: 80px;
+        top: 120px;
+    }
+
+    .font-control button {
+        font-size: 12px;
+        /* Fonte ainda menor em telas pequenas */
+        padding: 6px 10px;
+        /* Botões menores */
+    }
+
+    .control-toggle {
+        /* Ícone menor em telas pequenas */
+        padding: 8px;
+        /* Tamanho do botão de engrenagem ajustado */
+    }
+
+    .font-control.active {
+        top: 100px;
+        /* Ajusta a posição do painel */
+    }
+}
+
+
+/* Estilos do Header */
+nav {
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card-bg);
+    position: relative;
+    height: 60px;
+    z-index: 1000;
+}
+
+.logo {
+    color: var(--main-white);
+    margin-left: 50px;
+}
+
+nav ul {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    padding-right: 60px;
+}
+
+nav ul li {
+    list-style: none;
+    position: relative;
+    padding: 0px;
+    margin-top: 8px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--main-white);
+    cursor: pointer;
+    position: relative;
+}
+
+nav ul li a:hover,
+nav ul li ul li a:hover,
+.notification-btn:hover,
+.notification-icon ul.submenu li a:hover {
+    text-decoration: underline;
+}
+
+nav ul li ul.submenu,
+nav ul li ul.submenu.notification {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    width: 170px;
+}
+
+nav ul li ul.submenu {
+    background: var(--card-bg);
+}
+
+nav ul li ul.submenu.notification {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--main-green);
+}
+
+nav ul li ul.submenu li {
+    padding: 10px;
+    width: 100%;
+}
+
+#notificationMenu {
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    width: 280px;
+    background: var(--card-bg);
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+#notificationMenu::-webkit-scrollbar {
+    width: 6px;
+}
+
+#notificationMenu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#notificationMenu::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+#notificationMenu li:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    color: var(--main-white);
+    text-align: left;
+    width: 90%;
+    padding: 0;
+    font-size: 16px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.menu-icon {
+    display: none;
+}
+
+.menu-icon i {
+    color: var(--main-red);
+    margin-top: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+nav ul ul {
+    display: none;
+    position: absolute;
+    background-color: var(--bg-header);
+    padding: 10px;
+    list-style: none;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+nav ul li ul li {
+    padding: 10px 20px;
+}
+
+nav ul li ul li a {
+    color: var(--main-white);
+}
+
+@media (max-width: 950px) {
+    nav ul {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: start;
+        padding-left: 60px;
+        background: var(--card-bg);
+        gap: 0;
+        overflow-y: auto;
+        max-height: 300px;
+        box-shadow: 0 2px 2px rgba(255, 255, 255, 0.2);
+        transition: max-height 0.3s ease;
+    }
+
+    nav ul li {
+        padding: 20px;
+        padding-top: 5px;
+    }
+
+    nav ul ul,
+    nav ul li ul.submenu {
+        position: relative;
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    nav ul li ul li {
+        padding: 15px 20px;
+    }
+
+    .menu-icon {
+        display: block;
+    }
+
+    #menuList {
+        transition: all 0.7s;
+    }
+}
+
+/* Espaço entre o ícone e o texto */
+nav ul li a i {
+    margin-right: 8px;
+    color: var(--main-white);
+}
+
+/* Espaço entre os itens do menu */
+nav ul li {
+    margin-bottom: 5px;
+}
+
+/* Submenus com ícones também alinhados */
+nav ul li ul.submenu li a i {
+    margin-right: 6px;
+    color: var(--main-white);
+}
+
+.no-notification {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    color: #888;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.no-notification i {
+    color: crimson;
+}
+
+
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    margin-right: 0;
+    margin-top: 10px;
+}
+
+.notification-icon i {
+    color: var(--main-white);
+    font-size: 24px;
+    position: relative;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: crimson;
+    color: var(--main-white);
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.notification-icon ul.submenu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 120%;
+    background: var(--bg-header);
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 220px;
+    z-index: 1000;
+}
+
+.notification-icon ul.submenu li {
+    padding: 10px;
+    width: 100%;
+}
+
+.notification-icon ul.submenu li a {
+    color: var(--main-white);
+    text-decoration: none;
+}
+
+nav ul li a i.fa-chevron-down {
+    margin-left: 6px;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.user-photo-inline {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.submenu.avatar {
+    width: 50px;
+}
+
+/*Fim do Header*/
+
+.card-mytrade-container {
+    background: var(--main-bg);
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card-mytrade-card {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Trade em andamento */
+.card-mytrade-card.active {
+    border: 1px solid var(--main-orange);
+}
+
+.card-mytrade-card.active strong {
+    color: var(--main-orange);
+}
+
+/* Trade finalizada */
+.card-mytrade-card.completed {
+    border: 1px solid var(--main-green);
+}
+
+.card-mytrade-card.completed strong {
+    color: var(--main-green);
+}
+
+/* Trade cancelada */
+.card-mytrade-card.cancelled {
+    border: 1px solid var(--main-red);
+}
+
+.card-mytrade-card.cancelled strong {
+    color: var(--main-red);
+}
+
+
+/* Título da card */
+.card-mytrade-title {
+    color: var(--main-white);
+    font-size: 24px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.card-mytrade-search {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 8px;
+}
+
+.card-mytrade-search input {
+    padding: 8px;
+    width: 280px;
+    border: 1px solid #cccccc88;
+    background: none;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.card-mytrade-search button {
+    padding: 8px 12px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Conteúdo da card */
+.card-mytrade-card-content {
+    width: 70%;
+    /* Largura do conteúdo */
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+}
+
+/* Imagens */
+.card-mytrade-images {
+    display: flex;
+    gap: 10px;
+    /* Espaçamento entre as imagens */
+    margin-top: 30px;
+    padding: 0;
+    /* Padding para afastar do conteúdo */
+    width: 100%;
+    /* Use 100% para ocupar toda a largura do card */
+}
+
+.card-mytrade-images img {
+    width: 120px;
+    /* Aumente o tamanho fixo da imagem */
+    height: 200px;
+    /* Mantenha a altura fixa para as imagens */
+    object-fit: cover;
+    /* Preenche o espaço sem distorcer */
+    border-radius: 4px;
+    /* Bordas arredondadas */
+}
+
+/* Estilo do texto */
+.card-mytrade-card-content strong {
+    color: var(--main-red);
+}
+
+.card-mytrade-card-content p {
+    margin-left: 3px;
+    margin-top: 10px;
+    color: var(--main-white);
+}
+
+.card-mytrade-card-content a {
+    margin-left: 3px;
+    color: var(--main-white);
+    text-decoration: underline;
+}
+
+/* Ações dos botões */
+.card-mytrade-actions {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Botões - verde para concluir, vermelho para cancelar */
+.card-mytrade-btn-confirm,
+.card-mytrade-btn-cancel {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.card-mytrade-btn-confirm {
+    background-color: var(--main-green);
+    color: white;
+}
+
+.card-mytrade-btn-cancel {
+    background-color: var(--main-red);
+    color: white;
+}
+
+/* Efeito hover para os botões */
+
+/* Estilo do modal trade */
+.card-mytrade-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.342);
+}
+
+.card-mytrade-modal-buttons {
+    display: flex;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.card-mytrade-modal-content {
+    background-color: var(--card-bg);
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    /* Largura máxima do modal */
+}
+
+/* Fechar modal (X) */
+.card-mytrade-close-modal {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.card-mytrade-close-modal:hover,
+.card-mytrade-close-modal:focus {
+    color: var(--main-white);
+}
+
+.card-mytrade-modal h2 {
+    margin-bottom: 20px;
+    /* Espaçamento abaixo do título */
+}
+
+/* Botões dentro do modal */
+.card-mytrade-modal-buttons {
+    display: flex;
+    /* Utiliza flexbox */
+    justify-content: center;
+    /* Centraliza os botões */
+    gap: 3px;
+    /* Espaçamento entre os botões */
+}
+
+.card-mytrade-modal-buttons .card-mytrade-btn-confirm,
+.card-mytrade-modal-buttons .card-mytrade-btn-cancel {
+    width: 200px;
+    /* Largura fixa dos botões */
+    padding: 8px;
+    /* Aumenta o espaçamento interno */
+    font-size: 16px;
+    /* Tamanho da fonte dos botões */
+    border-radius: 5px;
+    /* Arredondamento das bordas dos botões */
+    cursor: pointer;
+    /* Cursor em forma de mão */
+    border: none;
+    /* Sem borda */
+}
+
+/* Cor de fundo do botão de confirmação */
+.card-mytrade-modal-buttons .card-mytrade-btn-confirm {
+    background-color: var(--main-green);
+    /* Verde */
+    color: var(--main-white);
+    /* Texto branco */
+}
+
+/* Cor de fundo do botão de cancelamento */
+.card-mytrade-modal-buttons .card-mytrade-btn-cancel {
+    background-color: var(--main-red);
+    /* Vermelho */
+    color: var(--main-white);
+    /* Texto branco */
+}
+
+/*Fim modal trade*/
+
+
+/*Landing page*/
+.landing-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 4rem 6%;
+    background: linear-gradient(to right, #1c1c1e, #2c2c2e);
+    color: #f5f5f5;
+    gap: 2rem;
+    align-items: center;
+}
+
+.landing-text {
+    flex: 1 1 500px;
+}
+
+.landing-text h1 {
+    font-size: 2.3rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.landing-text h2 {
+    margin-top: 2rem;
+    font-size: 1.8rem;
+    color: #e0e0e0;
+}
+
+.landing-text p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #d1d1d1;
+}
+
+.benefits-list,
+.steps-list {
+    margin-bottom: 2rem;
+    margin-top: 12px;
+    padding-left: 1rem;
+}
+
+.benefits-list li,
+.steps-list li {
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    color: #cccccc;
+}
+
+.highlight {
+    color: #d13239;
+    font-weight: bold;
+}
+
+.logo-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease;
+}
+
+.logo-image:hover {
+    transform: scale(1.05);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rules-section {
+    flex: 1 1 400px;
+    max-width: 600px;
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-left: 1px solid #d13239;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    animation: fadeIn 0.6s ease-in-out;
+    align-self: flex-start;
+}
+
+
+.rules-section h2 {
+    color: #d13239;
+    margin-bottom: 1rem;
+}
+
+.rules-section p,
+strong {
+    margin-top: 10px;
+}
+
+.rules-section strong {
+    color: #f2f2f2;
+    font-weight: 600;
+}
+
+/*Fim da landing page*/
+/* Animação de fade na transição */
+body.fade {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+body.fade-out {
+    opacity: 0;
+}
+
+body {
+    background: var(--main-bg);
+}
+
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    background: var(--main-black);
+}
+
+.auth-left h1 {
+    text-align: center;
+    margin-top: 40px;
+    color: var(--main-red);
+    font-size: 25px;
+}
+
+.auth-left h2 {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--main-red);
+    font-size: 20px;
+}
+
+.auth-left {
+    width: 45%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: auto;
+    /* box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.13); */
+
+}
+
+.auth-left form {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.input-div {
+    position: relative;
+    margin: auto;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 14px;
+}
+
+.input-div.login {
+    margin-top: 20px;
+}
+
+input {
+    color: var(--main-white);
+}
+
+.input-div input,
+select {
+    padding: 12px 12px 12px 42px;
+    border: 1px solid rgba(255, 255, 255, 0.185);
+    border-radius: 8px;
+    color: var(--main-white);
+    outline: none;
+    width: 300px;
+    background: transparent;
+    transition: all ease 0.2s;
+}
+
+.search-bar {
+    display: flex;
+    margin: 20px 0;
+}
+
+.search-input {
+    padding: 10px;
+    color: white;
+    background: var(--main-bg);
+    border: 1px solid rgba(255, 255, 255, 0.185);
+    border-radius: 5px;
+    width: 300px;
+    transition: box-shadow 0.3s ease;
+}
+
+.search-input input {
+    color: var(--main-white);
+}
+
+.search-button {
+    padding: 10px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.search-clear {
+    padding: 10px;
+    width: 80px;
+    background-color: var(--main-green);
+    /* Verde Bootstrap */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    /* Remove o contorno padrão do input */
+}
+
+.search-div select:hover {
+    cursor: pointer;
+}
+
+.input-div textarea {
+    padding: 15px 15px 15px 45px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    color: #ffffff;
+    outline: none;
+    width: 100%;
+    background: transparent;
+    /* border-radius: 7px; */
+    transition: all ease 0.2s;
+}
+
+.input-div label {
+    margin-top: 4px;
+    color: var(--main-red);
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.input-div i.fas {
+    position: absolute;
+    width: 50px;
+    height: 42px;
+    top: 16px;
+    left: 18px;
+    font-size: 13px;
+    color: var(--main-red);
+    font-size: 14px;
+}
+
+.input-div button:hover {
+    filter: brightness(90%);
+}
+
+.toast-top-right {
+    margin-top: 80px;
+}
+
+.toast-top-right .toast-error {
+    background: var(--main-red);
+}
+
+.auth-right {
+    width: 65%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.input-div img {
+    margin: auto;
+    border-radius: 50%;
+}
+
+.auth-right img {
+    width: 90%;
+    height: 100%;
+    margin-top: 20px;
+}
+
+.auth-right>h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--main-red);
+}
+
+/*Modal*/
+/* Estilos gerais */
+
+/* Estilos específicos para o modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.342)
+}
+
+.modal-content {
+    background-color: var(--main-bg);
+    /* Cor de fundo do conteúdo do modal */
+    margin: 15% auto;
+    /* Centraliza o modal verticalmente e o posiciona a 15% da parte superior */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    height: 170px;
+    /* Largura máxima do modal */
+}
+
+.close-modal {
+    color: var(--main-white);
+    /* Cor do botão de fechar */
+    float: right;
+    /* Alinha o botão de fechar à direita */
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: var(--main-white);
+    /* Cor do botão de fechar ao passar o mouse ou focar */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    display: flex;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.modal-buttons form {
+    width: 50%;
+}
+
+.modal-buttons div {
+    width: 50%;
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: 10px 18px;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.btn-search {
+    border-radius: 5px;
+}
+
+
+.btn-cancel {
+    width: 100%;
+    padding: 10px 18px;
+    background-color: var(--main-red);
+    margin-left: 10px;
+    color: var(--main-white);
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.btn-on {
+    margin-top: 10px;
+    height: 40px;
+    font-size: 16px;
+    color: var(--main-white);
+    font-weight: bold;
+    border: none;
+    text-align: center;
+    background: var(--main-red);
+    border-radius: 5px;
+    outline: none;
+    width: 100%;
+    /* border-radius: 7px; */
+    transition: all ease 0.2s;
+    cursor: pointer;
+}
+
+.btn-off {
+    height: 45px;
+    font-size: 16px;
+    color: var(--main-black);
+    font-weight: bold;
+    border: none;
+    text-align: center;
+    background: var(--main-red);
+    outline: none;
+    width: 100%;
+    border-radius: 7px;
+    transition: all ease 0.2s;
+    cursor: pointer;
+    opacity: 0.3;
+}
+
+
+.div-auth-links {
+    margin-top: 18px;
+    width: 100%;
+    padding-left: 84px;
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-links {
+    margin-top: 5px;
+    color: var(--main-white);
+    font-weight: 0;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.auth-links:hover {
+    text-decoration: underline;
+}
+
+.small-err-div {
+    margin-top: 0px;
+    padding: 1px;
+    margin-top: 2px;
+    padding-top: 1px;
+}
+
+.form-text {
+    color: rgb(242, 57, 57);
+    margin-left: 3px;
+    font-size: 13px;
+}
+
+
+/*LOGIN E CADASTRO*/
+.login-auth-container {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    color: var(--main-white);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.login-auth-left h1 {
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 28px;
+    color: var(--main-red);
+}
+
+.login-auth-left h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 20px;
+}
+
+.login-input-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.login-input-wrapper input {
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    border: 1px solid #cccccc6c;
+    border-radius: 8px;
+    background-color: transparent;
+    color: var(--main-white);
+    font-size: 14px;
+    outline: none;
+    box-shadow: none;
+}
+
+.login-input-wrapper input:focus {
+    border-color: #aaa;
+}
+
+.login-input-wrapper i {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--main-red);
+}
+
+.login-btn-submit {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--main-red);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.login-auth-links-wrapper {
+    margin-top: 20px;
+}
+
+.login-auth-link {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.login-auth-link:hover {
+    text-decoration: underline;
+}
+
+.login-error-message {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--main-red);
+}
+
+/*FIM LOGIN E CADASTRO*/
+
+/*EDIÇÃO DE PERFIL*/
+
+/*FIM EDIÇÃO
+
+/*BOOK API*/
+.book-api-container {
+    max-width: 1000px;
+    margin: 100px auto 60px;
+    padding: 0 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.book-api-search-bar {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.book-api-search-form {
+    display: flex;
+    gap: 10px;
+}
+
+.book-api-input {
+    padding: 10px 14px;
+    font-size: 16px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: none;
+}
+
+.book-api-button {
+    padding: 10px 20px;
+    background-color: crimson;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+
+.book-api-info-text {
+    margin-top: 20px;
+    font-size: 15px;
+    color: var(--main-white);
+}
+
+.book-api-results {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.book-api-card {
+    border-radius: 12px;
+    background: var(--card-bg);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.book-api-card:hover {
+    transform: translateY(-5px);
+}
+
+.book-api-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+
+.book-api-cover {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid #ddd;
+}
+
+.book-api-cover img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.book-api-card:hover .book-api-cover img {
+    transform: scale(1.05);
+}
+
+.book-api-details {
+    padding: 15px;
+    font-size: 14px;
+    color: var(--main-white);
+}
+
+.book-api-details p {
+    margin-bottom: 8px;
+}
+
+.book-api-not-found {
+    margin-top: 40px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+.book-api-input {
+    padding: 10px 14px;
+    font-size: 16px;
+    width: 300px;
+    border: 1px solid #999;
+    /* borda fraquinha */
+    border-radius: 8px;
+    background-color: transparent;
+    color: white;
+    outline: none;
+    box-shadow: none;
+    transition: none;
+}
+
+/* Remove COMPLETAMENTE o efeito de foco */
+.book-api-input:focus,
+.book-api-input:active,
+.book-api-input:focus-visible {
+    border: 1px solid #999 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    color: white;
+}
+
+/*FIM BOOK API*/
+
+@media(max-width:750px) {
+    .auth-right {
+        display: none;
+    }
+
+    .auth-left {
+        width: 100%;
+        margin: auto;
+    }
+
+    .search-bar .search-clear {
+        margin-top: 10px;
+    }
+
+    .image-area {
+        display: none;
+    }
+
+    .text-area {
+        max-width: 100%;
+    }
+
+    .card-mytrade-images {
+        display: none;
+    }
+
+    .card-mytrade-card {
+        width: 100%;
+    }
+
+    .card-mytrade-card-content {
+        width: 100%;
+    }
+}
+
+@media(max-width:450px) {
+    .auth-left {
+        width: 100%;
+    }
+}
+
+/* Livros */
+/* Container geral */
+.search-container {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px;
+    border-radius: 12px;
+    margin: 0 65px;
+}
+
+
+
+.search-container.title {
+    margin: 0px;
+}
+
+/* Div individual de cada item */
+.search-div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* SELECT estilizado */
+.search-select {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: #fff;
+    font-size: 15px;
+    font-family: Rubik, sans-serif;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    transition: border 0.3s ease;
+}
+
+.search-select:hover,
+.search-select:focus {
+    outline: none;
+}
+
+/* INPUT de pesquisa */
+.search-input {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    background: var(--card-bg);
+    font-size: 15px;
+    font-family: Rubik, sans-serif;
+    width: 350px;
+    transition: border 0.3s ease;
+}
+
+/* Botão de pesquisa */
+.btn-search {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--main-red);
+    color: white;
+    font-size: 15px;
+    font-family: Rubik, sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+.btn-search:active {
+    transform: translateY(0);
+}
+
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    padding-left: 70px;
+    padding-right: 70px;
+    margin-top: 20px;
+}
+
+.container.profile {
+    padding-left: 0px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: var(--card-bg);
+}
+
+.card:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0px 0px 0 0;
+}
+
+.card-content {
+    padding: 18px;
+    position: relative;
+}
+
+.card-content a {
+    text-decoration: none;
+    color: var(--main-white);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-content p {
+    color: #777;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn {
+    display: block;
+    width: 98%;
+    margin-top: 16px;
+    padding: 10px 18px;
+    font-weight: bold;
+    font-size: 15px;
+    background-color: var(--main-red);
+    border-radius: 5px;
+    color: var(--main-white);
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+
+.div-pagination {
+    width: 80%;
+    margin-left: 74px;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    /* Alinhar à esquerda */
+    margin-top: 10px;
+    /* Adicionar margem superior para afastar da borda */
+}
+
+
+.div-pagination ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.div-pagination ul li {
+    margin: 0 5px;
+    /* Ajuste o espaçamento entre os itens conforme necessário */
+}
+
+.div-pagination ul li a {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+/*Book Details */
+
+.main-details {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 20px;
+    min-height: 100vh;
+    overflow: auto;
+}
+
+.md-links {
+    display: flex;
+    flex-direction: row;
+    margin-left: 18px;
+}
+
+.md-links a {
+    color: var(--main-white);
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 12px;
+    text-decoration: underline;
+}
+
+.md-links p {
+    margin-left: 10px;
+    color: var(--main-white);
+    font-style: italic;
+}
+
+.md-links a:hover {
+    text-decoration: underline;
+}
+
+.book-details {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.user-details {
+    margin-left: 100px;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 10px;
+    padding: 10px;
+}
+
+h3 {
+    color: #6d5c09;
+}
+
+/*Profile*/
+/* Estilo do container principal */
+.user-profile {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    max-width: 800px;
+}
+
+/*My Books*/
+
+/* Layout principal */
+.mybooks-section {
+    margin: 20px 80px;
+}
+
+.mybooks-no-books {
+    color: var(--main-red);
+    font-style: italic;
+    margin-top: 40px;
+}
+
+.mybooks-header {
+    margin-top: 30px;
+    color: var(--main-red);
+}
+
+.edit-profile-button {
+    background-color: var(--main-green);
+    ;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Paginação */
+.mybooks-pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination-list {
+    display: inline-block;
+    padding: 0;
+    list-style-type: none;
+}
+
+.pagination-item {
+    display: inline;
+    margin-right: 5px;
+}
+
+.pagination-link {
+    padding: 8px 12px;
+    background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.pagination-item.active .pagination-link {
+    background-color: var(--main-red);
+    color: white;
+}
+
+/* Barra de busca */
+.mybooks-search-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.mybooks-category-select,
+.mybooks-search-input {
+    padding: 8px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.mybooks-btn-search {
+    padding: 8px 16px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Grid de livros */
+.mybooks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* Card do livro */
+.mybooks-card {
+    background-color: var(--main-white);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 180px;
+}
+
+.mybooks-cover {
+    margin-bottom: 10px;
+}
+
+.mybooks-cover {
+    width: 100%;
+}
+
+.mybooks-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.mybooks-info {
+    margin-bottom: 8px;
+}
+
+.mybooks-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.mybooks-author,
+.mybooks-category,
+.mybooks-code {
+    font-size: 12px;
+    color: #666;
+    margin: 2px 0;
+}
+
+/* Botão Remover */
+.mybooks-btn-remove {
+    width: 90%;
+    padding: 6px 10px;
+    background-color: var(--main-red);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: 5px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .mybooks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mybooks-card {
+        width: 100%;
+    }
+
+    .mybooks-image {
+        width: 100%;
+        height: auto;
+    }
+}
+
+
+/*End My Books*/
+
+.book-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    list-style: none;
+    padding: 0;
+}
+
+.book-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border-radius: 10px;
+    width: 150px;
+}
+
+.book-list li:hover {
+    background: var(--card-bg);
+}
+
+.div-pagination.title {
+    margin-left: 3px;
+}
+
+.book-cover img {
+    width: 100px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+
+.book-info {
+    margin-top: 0px;
+    background: var(--card-bg);
+    border-radius: 5px;
+}
+
+.book-info h2 {
+    margin-top: 5px;
+    color: var(--main-white);
+    padding: 10px;
+}
+
+.book-info p {
+    font-size: 16px;
+    color: var(--main-white);
+    padding: 10px;
+}
+
+/*Book card*/
+
+
+/*End Book card*/
+
+.user-image img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.user-info {
+    margin-left: 20px;
+}
+
+.user-info h2 {
+    color: var(--main-white);
+    margin-bottom: 10px;
+}
+
+.user-rating {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.star {
+    font-size: 20px;
+    color: gold;
+    margin-right: 5px;
+}
+
+.user-info p {
+    margin: 5px 0;
+    color: var(--main-white);
+    font-size: 16px;
+}
+
+/*End Profile*/
+
+.book-image {
+    display: flex;
+    overflow: hidden;
+    height: 418px;
+}
+
+.book-image img {
+    width: 100%;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.book-soli-image {
+    height: 250px;
+}
+
+.book-soli-image img {
+    height: 250px;
+}
+
+.book-info {
+    display: flex;
+    max-height: 100%;
+    flex-direction: column;
+    padding-left: 0px;
+}
+
+.book-action {
+    display: flex;
+    height: 420px;
+    padding: 14px;
+    font-style: italic;
+    flex-direction: column;
+    background: var(--card-bg);
+    border-radius: 5px;
+}
+
+.book-property {
+    display: flex;
+    width: 100%;
+    height: 300px;
+    flex-direction: column;
+}
+
+.book-property strong {
+    color: var(--main-red);
+}
+
+.book-property p {
+    color: var(--main-white);
+    margin-left: 5px;
+}
+
+.book-property h2 {
+    color: var(--main-white);
+}
+
+
+
+@media screen and (max-width: 900px) {
+    .book-info {
+        margin-top: 20px;
+    }
+
+    .book-details {
+        display: block;
+    }
+
+    .book-image,
+    .book-info,
+    .book-button {
+        width: 100%;
+    }
+}
+
+#selectBook option {
+    background-color: var(--card-bg);
+}
+
+select option {
+    background: var(--bg-card);
+}
+
+@media screen and (max-width:700px) {
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        width: 98%;
+        padding: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+        /* Espaço abaixo do container */
+    }
+
+    .search-div {
+        width: 90%;
+        display: flex;
+    }
+
+    .search-div select {
+        padding: 10px 10px 8px 40px;
+        border: 1px solid rgba(128, 128, 128, 0.5);
+        color: var(--main-white);
+        outline: none;
+        width: 90%;
+        transition: all ease 0.2s;
+    }
+
+    .search-div input {
+        margin-top: 0px;
+        padding: 8px 8px 8px 45px;
+        border: 1px solid rgba(128, 128, 128, 0.5);
+        outline: none;
+        width: 90%;
+        transition: all ease 0.2s;
+    }
+
+    .search-div button {
+        margin-top: 0px;
+        width: 120px;
+    }
+}
+
+/*Table*/
+.main-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-content p {
+    margin-top: 10px;
+    margin-left: 80px;
+    color: var(--main-white);
+}
+
+.main-content h1 {
+    margin-top: 30px;
+    margin-left: 80px;
+    font-weight: bold;
+    color: var(--main-red)
+}
+
+.table-responsive {
+    margin-top: 0px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table {
+    width: 100%;
+    padding: 0px;
+}
+
+.table thead tr {
+    color: var(--main-white);
+}
+
+.table th,
+.table td {
+    padding: 8px;
+
+}
+
+.table td {
+    color: var(--main-red);
+}
+
+.limited-characters {
+    max-width: 100px;
+    /* Defina a largura máxima que você deseja permitir */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* Adiciona reticências (...) quando o texto for cortado */
+}
+
+.table-link {
+    color: var(--main-red);
+    font-weight: bold;
+}
+
+.table-link:hover {
+    text-decoration: underline;
+}
+
+.table thead {
+    background: var(--main-red);
+}
+
+.tb-link {
+    color: var(--main-red);
+}
+
+.tb-link:hover {
+    text-decoration: underline;
+}
+
+.select-offer {
+    padding: 6px 6px 8px 40px;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    color: var(--main-white);
+    outline: none;
+    width: 98%;
+    background: transparent;
+    transition: all ease 0.2s;
+}
+
+
+.table-btn-edit {
+    width: 100%;
+    padding: 10px 18px;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.table-btn-remove {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px 18px;
+    font-weight: bold;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    border-radius: 5px;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.pagination {
+    margin-top: 20px;
+}
+
+.btn-pagination {
+    padding: 8px 16px;
+    background-color: var(--main-red);
+    color: var(--main-white);
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.btn-pagination:hover {
+    background-color: var(--main-green);
+    ;
+}
+
+/*Solicitation page*/
+.trade-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    width: 98%;
+    margin: auto;
+}
+
+.my-books,
+.other-user-book {
+    margin-top: 0px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.my-books h2,
+.other-user-book h2 {
+    margin-bottom: 10px;
+}
+
+.my-books form {
+    margin-bottom: 20px;
+}
+
+.my-books select {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(75, 63, 65, 0.308);
+    font-size: 16px;
+}
+
+.my-books select:hover {
+    cursor: pointer;
+}
+
+.my-books .btn-confirm {
+    background-color: var(--main-green);
+    color: var(--main-white);
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.my-books .btn-confirm:hover {
+    filter: brightness(90%);
+}
+
+.my-books strong {
+    color: var(--main-red);
+}
+
+.my-books p {
+    color: var(--main-white);
+}
+
+.other-user-book-details {
+    text-align: left;
+}
+
+.other-user-book-details h3,
+.other-user-book-details p {
+    margin-left: 0px;
+    color: var(--main-white);
+    font-weight: bold;
+}
+
+.other-user-book-details {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.other-user-book-details .book-image {
+    width: 200px;
+    background: #000;
+}
+
+.other-user-book-details .book-image img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+/*Toast*/
+.custom-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: var(--main-white);
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+}
+
+.custom-toast.show {
+    display: block;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+    from {
+        bottom: 0;
+        opacity: 0;
+    }
+
+    to {
+        bottom: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        bottom: 20px;
+        opacity: 1;
+    }
+
+    to {
+        bottom: 0;
+        opacity: 0;
+    }
+}
+
+/* Fixando o botão e o plugin na parte inferior da tela */
+.vw-plugin-wrapper {
+    position: fixed;
+    bottom: 0;
+    /* Fixa no rodapé */
+    left: 0;
+    width: 100%;
+    /* Ocupa toda a largura da tela */
+    z-index: 10000;
+    /* Garante que fique acima de outros elementos */
+}
+
+/* O botão de acessibilidade também será fixado no canto inferior */
+.vw-access-button {
+    position: fixed;
+    bottom: 20px;
+    /* Distância do fundo da tela */
+    left: 20px;
+    /* Distância da lateral esquerda */
+    z-index: 10001;
+    /* Certifica que o botão sempre ficará acima do plugin */
+}
+
+/* Se o botão ou plugin interferir em conteúdo, ajuste a posição */
+@media (max-width: 768px) {
+    .vw-access-button {
+        bottom: 20px;
+        /* Ajuste conforme necessário */
+        left: 20px;
+        /* Para telas menores */
+    }
+
+    .vw-plugin-wrapper {
+        bottom: 0;
+    }
+}
+
+.trade-cancelled {
+    opacity: 0.6;
+    /* ou use 0.4 para mais apagado */
+    border: 1px solid #f44336;
+
+    color: #a94442;
+}
+
+.trade-cancelled a {
+    color: #a94442;
+    text-decoration: line-through;
+}
+
+.trade-cancelled .card-mytrade-btn-confirm,
+.trade-cancelled .card-mytrade-btn-cancel {
+    display: none;
+    /* Oculta os botões, se quiser */
+}
+
+.cards-resenha-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card-resenha {
+    display: flex;
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.card-resenha-image {
+    flex-shrink: 0;
+    width: 120px;
+    height: 180px;
+    overflow: hidden;
+    background-color: #333;
+}
+
+.card-resenha-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-style: italic;
+    font-size: 14px;
+    background-color: #2c2c2c;
+}
+
+.card-resenha-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+    /* espaçamento entre os elementos */
+    flex: 1;
+}
+
+
+.card-resenha-title {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--main-red);
+}
+
+.card-resenha-title a {
+    color: var(--main-red);
+    text-decoration: none;
+}
+
+.card-resenha-title a:hover {
+    text-decoration: underline;
+}
+
+.card-resenha-content p,
+.card-resenha-content strong,
+.card-resenha-content a {
+    margin: 0;
+    padding: 0;
+}
+
+.title-detail-container {
+    width: 98%;
+    margin: 20px auto;
+    padding: 12px;
+    font-family: 'Rubik', sans-serif;
+    border-radius:5px;
+}
+
+.title-main-info {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+    background: var(--card-bg);
+    border-radius:8px;
+    padding:20px;
+}
+
+.title-image {
+    flex: 1;
+    max-width: 200px;
+    position: relative;
+}
+
+.title-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.rating-section {
+    margin-top: 15px;
+}
+
+.rating-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-left: 10px;
+    color: var(--main-white);
+    margin-bottom: 8px;
+}
+
+.btn-see-comments {
+    display: inline-block;
+    padding: 8px 8px;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    user-select: none;
+}
+
+.comment-snippet {
+    margin-top: 10px;
+    font-style: italic;
+    color: var(--main-white);
+    font-size: 0.95rem;
+}
+
+.title-details {
+    flex: 2;
+}
+
+.title-details h1 {
+    margin-top: 0;
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    color: var(--main-white);
+}
+
+.title-details p {
+    line-height: 1.5;
+    margin: 8px 0;
+    color: var(--main-white);
+}
+
+/* Comentários */
+.title-rating-comments {
+    border-top: 1px solid #444; /* tom para separar, ajustado para tema escuro */
+    padding-top: 25px;
+}
+
+.title-rating-comments h3 {
+    margin-bottom: 20px;
+    color: var(--main-white);
+    font-size: 1.5rem;
+}
+
+.title-rating-comments ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* espaço entre cards */
+}
+
+.title-rating-comments li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    background-color: var(--card-bg);
+    color: var(--main-white);
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* Imagem do usuário */
+.comment-user-image {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Container do texto do comentário */
+.comment-content {
+    flex-grow: 1;
+}
+
+.user-resenha{
+    border-radius:8px;
+}
+
+/* Nome do usuário */
+.comment-content a {
+    color:var(--main-red);
+    display: block;
+    margin-bottom: 0px;
+    margin-top: 5px;
+    font-weight: normal;
+    font-size: 18px;
+    text-decoration: underline;
+}
+
+/* Texto do comentário */
+.comment-content p {
+    margin: 0 0 6px 0;
+    word-wrap: break-word;
+    font-size: 1rem;
+}
+
+/* Data do comentário */
+.comment-content small {
+    color: #bbb;
+    font-size: 0.85rem;
+}
+
+/* Botão de deletar (ícone de lixeira) */
+.title-rating-comments li form {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+}
+
+.title-rating-comments li form button {
+    background: transparent;
+    border: none;
+    color: #e74c3c; /* vermelho para deletar */
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    padding: 4px;
+    transition: color 0.2s ease;
+}
+
+.title-rating-comments li form button:hover {
+    color: #c0392b;
+}
+
+/* Formulário para novo comentário */
+.title-rating-comments form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-rating-comments textarea {
+    resize: vertical;
+    min-height: 80px;
+    padding: 10px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #222;
+    color: var(--main-white);
+    transition: border-color 0.3s ease;
+}
+
+.title-rating-comments textarea:focus {
+    outline: none;
+    border-color: var(--main-white);
+    box-shadow: 0 0 2px var(--main-white);
+}
+
+.title-rating-comments form button {
+    margin-top: 10px;
+    align-self: flex-start;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+}
+
+/* Mensagem para login (quando não logado e não pode comentar) */
+.title-rating-comments p {
+    margin-top: 20px;
+    color: #999;
+    font-style: italic;
+}
+
+
+/* Formulário para novo comentário */
+.title-rating-comments form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-rating-comments textarea {
+    resize: vertical;
+    min-height: 80px;
+    padding: 10px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #222;
+    color: var(--main-white);
+    transition: border-color 0.3s ease;
+}
+
+.title-rating-comments form button {
+    margin-top: 10px;
+    align-self: flex-start;
+    background-color: var(--main-green);
+    color: var(--main-white);
+    padding: 10px 16px;
+    border-radius: 5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+}
+
+/* Mensagem para login (quando não logado e não pode comentar) */
+.title-rating-comments p {
+    margin-top: 10px;
+    color: white;
+    font-style:normal;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+
+/* Telas menores que 900px (tablet) */
+@media (max-width: 900px) {
+    .title-main-info {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .title-image {
+        max-width: 350px;
+        width: 100%;
+    }
+
+    .title-details {
+        width: 100%;
+    }
+
+    .title-details h1 {
+        font-size: 2rem;
+    }
+}
+
+/* Estilos para página de solicitações */
+.solicitacoes-main {
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.solicitacoes-titulo {
+    color: var(--main-white);
+    margin-bottom: 20px;
+}
+
+.solicitacoes-paginacao {
+    margin-bottom: 20px;
+}
+
+.solicitacoes-paginacao ul {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+}
+
+.solicitacoes-paginacao li a {
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    color: #333;
+}
+
+.solicitacoes-paginacao li.active a {
+    background-color: #D13239;
+    color: white;
+}
+
+.solicitacoes-alerta {
+    color: var(--main-white);
+}
+
+.solicitacoes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    /* Ajuste conforme seu layout */
+    margin: 0 auto;
+    /* Centraliza na tela */
+}
+
+.solicitacoes-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: 0.3s ease;
+}
+
+.solicitacoes-card:hover {
+    transform: translateY(-5px);
+}
+
+.trader-name {
+    color: var(--main-red);
+    font-size: 18px;
+}
+
+.solicitacoes-topo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.solicitacoes-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.solicitacoes-codigo {
+    margin-left: auto;
+    font-size: 12px;
+    color: #999;
+}
+
+.solicitacoes-livros {
+    display: flex;
+    gap: 12px;
+}
+
+.livro-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #2a2a2a;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+.livro-item:hover {
+    background-color: #333;
+}
+
+.livro-item a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--main-white);
+    font-size: 14px;
+    gap: 10px;
+}
+
+.livro-img {
+    width: 45px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+.solicitacoes-acoes {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.solicitacoes-btn-aceitar,
+.solicitacoes-btn-recusar {
+    padding: 10px 10px;
+    width: 120px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.solicitacoes-btn-aceitar {
+    background-color: var(--main-green);
+    color: white;
+}
+
+.solicitacoes-btn-recusar {
+    background-color: var(--main-red);
+    color: white;
+}
+
+.modal-content {
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 800px;
+    background-color: #1e1e1e;
+    position: relative;
+}
+
+.modal-form-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0px;
+}
+
+.close-modal {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.btn-confirm {
+    background-color: var(--main-green);
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    margin: 5px;
+}
+
+.btn-cancel {
+    background-color: var(--main-red);
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    margin: 5px;
+}
+
+.solicitacoes-data {
+    margin-top: 20px;
+}
+
+.solicitacoes-data p {
+    color: var(--main-green);
+}
+
+/*Painel para adicionar novo livro*/
+.bookadd-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.bookadd-card {
+    background-color: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+.bookadd-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: var(--main-red);
+}
+
+.bookadd-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.bookadd-field {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.bookadd-field label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--main-red);
+}
+
+.bookadd-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #2c2c2c;
+}
+
+.bookadd-input-wrapper input,
+.bookadd-input-wrapper textarea {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 1rem;
+}
+
+.bookadd-input-wrapper i {
+    color: var(--main-red);
+}
+
+
+
+select#category,
+input[type="file"] {
+    padding: 8px;
+    width: 90%;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.445);
+    font-size: 14px;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+    color: white;
+}
+
+.bookadd-submit {
+    margin-top: 1.5rem;
+}
+
+.bookadd-submit button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--main-green);
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/*Fim do Painel para adicionar novo livro*/
+
+#search {
+    padding: 9px;
+    border: 1px solid rgba(255, 255, 255, 0.445);
+    border-radius: 8px;
+}
+
+/*Painel de solicitações admin*/
+
+.div-pagination.pending {
+    margin-left: 0px;
+}
+
+.bookrequests-main {
+    max-width: 100%;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.bookrequests-title {
+    color: var(--main-white);
+    font-size: 20px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.bookrequests-page-label {
+    margin-left: 20px;
+    font-weight: 500;
+}
+
+.bookrequests-pagination {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.bookrequests-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 colunas iguais */
+    gap: 20px;
+    margin-top: 20px;
+}
+
+
+.bookrequests-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.bookrequests-card:hover {
+    transform: scale(1.02);
+}
+
+.bookrequests-card-img img {
+    width: 120px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bookrequests-card-info {
+    padding: 15px;
+    flex: 1;
+}
+
+.bookrequests-card-info p {
+    margin: 6px 0;
+    color: var(--main-red);
+}
+
+.bookrequests-card-info a {
+    color: var(--main-white);
+    text-decoration: none;
+}
+
+.bookrequests-card-info a:hover {
+    text-decoration: underline;
+}
+
+.bookrequests-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.bookrequests-btn-accept,
+.bookrequests-btn-reject {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bookrequests-btn-accept {
+    background-color: var(--main-green);
+    color: white;
+}
+
+.bookrequests-btn-reject {
+    background-color: var(--main-red);
+    color: white;
+}
+
+.bookrequests-btn-reject:hover {
+    background-color: #c82333;
+}
+
+/*Fim Painel do admin*/
+
+/*livro detalhes*/
+
+/*livro detalhes*/
+
+.detail-container {
+    width: 98%;
+    margin: 40px auto;
+    height: auto;
+    min-height: 100vh;
+    border-radius: 5px;
+    padding: 5px 10px 0 20px;
+    background: var(--card-bg);
+    color: #222;
+    overflow: hidden;
+    /* evita conteúdo vazando */
+    padding-bottom: 40px;
+
+}
+
+.breadcrumb-links {
+    font-size: 14px;
+    margin-bottom: 16px;
+    color: var(--main-white);
+    margin-top: 20px;
+}
+
+.breadcrumb-links a {
+    color: var(--main-red);
+    text-decoration: none;
+    margin-right: 8px;
+}
+
+.breadcrumb-links a:hover {
+    text-decoration: underline;
+}
+
+.detail-main {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.detail-image {
+    flex: 1 1 300px;
+    max-width: 300px;
+}
+
+.main-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.thumbnails-container {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.thumbnail-img {
+    width: 50px;
+    height: 70px;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out;
+    flex-shrink: 0;
+}
+
+.thumbnail-img:hover,
+.thumbnail-img:focus {
+    border-color: crimson;
+}
+
+.detail-info {
+    flex: 2 1 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-title {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: var(--main-red);
+}
+
+.detail-description {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    color: var(--main-white);
+    margin-top: 12px;
+}
+
+.detail-properties strong {
+    color: var(--main-red);
+}
+
+.detail-properties p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: var(--main-white);
+}
+
+.owner-link {
+    color: var(--main-red);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.owner-link:hover {
+    text-decoration: underline;
+}
+
+.actions-row {
+    margin-top: 0px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-review,
+.btn-remove,
+.btn-submit {
+    padding: 8px 18px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn-review {
+    background-color: var(--main-white);
+    color: var(--main-red);
+}
+
+.btn-remove {
+    background-color: var(--main-red);
+    color: white;
+}
+
+.btn-submit {
+    background-color: var(--main-green);
+    color: white;
+}
+
+.offer-form-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.search-select.book-details {
+    padding: 6px 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.search-select.book-details:focus {
+    outline: none;
+    border-color: crimson;
+}
+
+/* Responsividade aprimorada */
+@media (max-width: 768px) {
+    .detail-main {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .detail-image,
+    .detail-info {
+        max-width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .actions-row {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .offer-form-inline {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .btn-review,
+    .btn-remove,
+    .btn-submit,
+    .search-select.book-details {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .thumbnails-container {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .thumbnail-img {
+        width: 60px;
+        height: 60px;
+        aspect-ratio: 1;
+    }
+}
+
+.user-rating {
+    display: flex;
+    gap: 4px;
+    /* alinhamento das estrelas da esquerda para a direita */
+}
+
+.star {
+    font-size: 24px;
+    color: orange;
+    /* cinza para estrela vazia */
+    user-select: none;
+}
+
+.star.filled {
+    color: orange;
+    /* amarelo ouro para estrelas preenchidas */
+}
+
+.card-mytrade-link.details {
+    color: var(--main-white);
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Layout geral */
+.tela-troca {
+    display: flex;
+    gap: 10px;
+    padding: 30px;
+    width: 100%;
+    margin: auto;
+}
+
+
+/* Coluna de informações */
+.coluna-info {
+    flex: 1;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.coluna-info h2 {
+    margin-bottom: 20px;
+    color: var(--main-white);
+}
+
+.box-info p {
+    margin: 10px 0;
+    color: var(--main-white);
+}
+
+.box-info a {
+    color: var(--main-white);
+    margin-left: 5px;
+    text-decoration: underline;
+}
+
+.imagens-livros {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.imagens-livros img {
+    width: 120px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.card-mytrade-btn-confirm.td,
+.card-mytrade-btn-cancel.td {
+    width: 200px;
+}
+
+/* Coluna de recados */
+.coluna-recados {
+    flex: 1;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.coluna-recados h2 {
+    margin-bottom: 10px;
+    color: var(--main-white);
+}
+
+.aviso-recados {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+/* Caixa de recados */
+/* Recados - estilo formal, sem cara de chat */
+.box-recados {
+    border-radius: 8px;
+    padding: 0px;
+    background-color: var(--card-bg);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.recado {
+    position: relative;
+    padding: 10px 40px 10px 10px;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* Cores dos recados */
+.recado.meu {
+    background-color: var(--card-bg);
+    color: var(--main-white);
+    align-self: flex-end;
+    border:1px solid var(--main-green);
+}
+
+.recado.outro {
+    background-color: var(--card-bg);
+    color: var(--main-white);
+    align-self: flex-start;
+     border:1px solid orange;
+}
+
+.recado {
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header do recado */
+.recado-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.recado .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.recado .autor {
+    font-weight: bold;
+}
+
+.recado .data {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Conteúdo da mensagem */
+.recado-conteudo {
+    margin-top: 5px;
+    word-break: break-word;
+}
+
+/* Botões editar/excluir */
+.recado-acoes {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-icone {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-icone:hover {
+    opacity: 0.7;
+}
+
+
+.form-recado {
+    width: 100%;
+    margin-top: 10px;
+    background: var(--card-bg);
+    color: white;
+    border-radius: 8px;
+    padding: 0px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-recado textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 12px;
+    border-radius: 6px;
+    resize: none;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.form-recado textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-recado textarea:focus,
+.form-recado button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+.form-recado button {
+    background: var(--main-green);
+    color: white;
+    width: 200px;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-conteudo {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    color: #fff;
+}
+
+.modal-botoes {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal textarea {
+    width: 100%;
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+}
+
+
+/* Modal Editar */
+.modal-editar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    /* quando ativar, controlar via JS */
+}
+
+.modal-editar .modal-conteudo {
+    background-color: var(--card-bg, #222);
+    color: white;
+    padding: 1.8rem 2.4rem;
+    border-radius: 10px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-editar .modal-conteudo h3 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    color: var(--main-green, #28a745);
+}
+
+.modal-editar textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    height: 300px;
+    border-radius: 6px;
+    border: 1.5px solid var(--main-green, #28a745);
+    background-color: #333;
+    color: white;
+    resize: vertical;
+    box-sizing: border-box;
+    margin-bottom: 1.6rem;
+    transition: border-color 0.3s ease;
+}
+
+.modal-editar textarea:focus {
+    outline: none;
+    border-color: var(--main-green-light, #5cd65c);
+    background-color: #2b2b2b;
+}
+
+.modal-editar .modal-botoes {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+
+.modal-editar .modal-botoes button,
+.modal-editar .modal-botoes form button {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.6rem 1.6rem;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 100px;
+}
+
+/* Botão Salvar */
+.modal-editar .modal-botoes button[type="submit"] {
+    background-color: var(--main-green, #28a745);
+    color: white;
+}
+
+/* Botão Cancelar */
+.modal-editar .modal-botoes button[type="button"] {
+    background-color: var(--main-red, #dc3545);
+    color: white;
+}
+
+/* Modal Excluir */
+.modal-excluir {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    /* controlar via JS */
+}
+
+.modal-excluir .modal-conteudo {
+    background-color: var(--card-bg, #222);
+    color: white;
+    padding: 1.8rem 2.4rem;
+    border-radius: 10px;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+.modal-excluir .modal-conteudo h3 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--main-green, #28a745);
+}
+
+.modal-excluir .modal-conteudo p {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #ddd;
+}
+
+.modal-excluir .modal-botoes {
+    margin-top: 10px;
+    display: flex;
+    gap: 1rem;
+    justify-content: left;
+}
+
+.modal-excluir .modal-botoes button+button {
+    margin-left: 10px;
+}
+
+.modal-excluir .modal-botoes button,
+.modal-excluir .modal-botoes form button {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.6rem 1.6rem;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 100px;
+}
+
+/* Botão Confirmar Exclusão */
+.modal-excluir .modal-botoes button[type="submit"] {
+    background-color: var(--main-green, #28a745);
+    color: white;
+}
+
+/* Botão Cancelar */
+.modal-excluir .modal-botoes button[type="button"] {
+    background-color: var(--main-red, #dc3545);
+    color: white;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+
+    .modal-editar .modal-conteudo,
+    .modal-excluir .modal-conteudo {
+        padding: 1.2rem 1.6rem;
+    }
+
+    .modal-editar .modal-botoes button,
+    .modal-editar .modal-botoes form button,
+    .modal-excluir .modal-botoes button,
+    .modal-excluir .modal-botoes form button {
+        font-size: 0.9rem;
+        min-width: 80px;
+        padding: 0.5rem 1.2rem;
+    }
+}
+
+/* Esconde os modais ao carregar */
+.modal-editar,
+.modal-excluir {
+    display: none;
+}
+
+/* Responsividade para a coluna de recados */
+@media (max-width: 1024px) {
+    .coluna-recados {
+        padding: 16px;
+    }
+
+    .box-recados {
+        max-height: 300px;
+    }
+
+    .form-recado button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .tela-troca {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .coluna-recados,
+    .coluna-info {
+        width: 100%;
+    }
+
+    .box-recados {
+        max-height: 250px;
+    }
+
+    .form-recado button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .coluna-recados {
+        padding: 12px;
+    }
+
+    .box-recados {
+        max-height: 200px;
+    }
+
+    .recado {
+        padding: 8px;
+    }
+
+    .recado-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .recado .data {
+        font-size: 0.75rem;
+    }
+
+    .form-recado textarea {
+        font-size: 13px;
+    }
+
+    .form-recado button {
+        padding: 10px;
+        font-size: 14px;
+        width: 100%;
+    }
+}
+
+.input-trade {
+  margin-top: 8px;
+  width: 300px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: none; /* Remove qualquer borda */
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.08); /* Um pouquinho mais visível */
+  color: white;
+  box-sizing: border-box;
+  outline: none; /* Remove contorno de foco */
+}
+
+.input-trade::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Opcional: Se quiser um leve sombreado pra destacar */
+.input-trade {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Mantém sem efeitos de focus irritantes */
+.input-trade:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.acoes-troca{
+    display: flex;
+    flex-direction: column;
+}
+
+/* Avaliação atual média */
+.current-rating h3 {
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: white;
+}
+
+/* Estrelas da avaliação */
+.stars-display {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Estilos das estrelas */
+.star {
+  color: gold;
+  user-select: none;
+  pointer-events: none;
+  position: relative;
+  font-size: 24px;
+}
+
+/* Estrela vazia */
+.star.empty {
+  color: #555;
+}
+
+/* Meia estrela usando gradiente para metade colorida */
+.star.half::before {
+  content: '★';
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: gold;
+}
+
+/* Número da avaliação */
+.rating-number {
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+}
+
+.rating-form{
+    background: var(--card-bg);
+    padding:0px;
+    width:300px;
+    border-radius:5px;
+}
+.rating-stars {
+  direction: rtl; /* Inverte a ordem para que as estrelas funcionem da direita para a esquerda */
+  unicode-bidi: bidi-override; /* Garante que o texto/inversão funcione */
+  display: inline-flex; /* para alinhar as estrelas lado a lado */
+}
+
+.rating-stars label {
+  font-size: 30px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  user-select: none;
+  margin-left: 5px; /* mudou de margin-right para margin-left por causa do rtl */
+  margin-right: 0;
+}
+
+/* O input fica oculto, isso está certo */
+.rating-stars input[type="radio"] {
+  display: none;
+}
+
+/* Cores para hover e selecionado (checked) */
+.rating-stars label:hover,
+.rating-stars label:hover ~ label,
+.rating-stars input[type="radio"]:checked ~ label {
+  color: gold;
+}
+
+.rating-form button{
+    padding:8px;
+    border:none;
+    border-radius:5px;
+    color:var(--main-white);
+    font-weight: bold;
+    background: var(--main-green);
+}
+
+.click-rating{
+    margin-top: 10px;
+    color:var(--main-red);
+    text-decoration: underline;
+}
+
+

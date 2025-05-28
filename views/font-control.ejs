@@ -1,0 +1,101 @@
+<!-- Botão para abrir o painel -->
+<button class="control-toggle" id="control-toggle">
+    <i class="fa fa-cogs"></i> <!-- Ícone de engrenagem para indicar configurações -->
+</button>
+
+<!-- Painel de controle -->
+<div class="font-control" id="font-control">
+    <button id="increase-font"><i class="fa fa-plus"></i></button>
+    <button id="decrease-font"><i class="fa fa-minus"></i></button>
+    <button id="change-font"><i class="fa fa-text-height"></i></button> <!-- Botão de troca de fonte -->
+    <button id="toggle-theme"><i class="fa fa-adjust"></i></button> <!-- Botão de tema dark/light -->
+</div>
+
+<script>
+    // Seleciona os elementos
+    const controlToggle = document.getElementById("control-toggle");
+    const fontControl = document.getElementById("font-control");
+
+    // Função para abrir/fechar o painel
+    controlToggle.addEventListener("click", () => {
+        fontControl.classList.toggle("active");
+    });
+
+    // Define o valor padrão de zoom
+    let zoomValue = 1;
+    document.body.style.zoom = zoomValue;
+
+    // Função para ajustar o zoom
+    function adjustZoom(change) {
+        zoomValue += change;
+        zoomValue = Math.max(0.5, Math.min(2, zoomValue));
+        document.body.style.zoom = zoomValue;
+        localStorage.setItem("zoomValue", zoomValue);
+    }
+
+    // Função para redefinir o zoom
+    function resetZoom() {
+        zoomValue = 1;
+        document.body.style.zoom = zoomValue;
+        localStorage.removeItem("zoomValue");
+    }
+
+    // Eventos de clique para os botões de zoom
+    document.getElementById("increase-font").addEventListener("click", () => adjustZoom(0.1));
+    document.getElementById("decrease-font").addEventListener("click", () => adjustZoom(-0.1));
+    document.getElementById("reset-font").addEventListener("click", resetZoom);
+
+    // Aplica o zoom salvo ao carregar a página
+    window.addEventListener("load", () => {
+        const savedZoom = localStorage.getItem("zoomValue");
+        if (savedZoom) {
+            zoomValue = parseFloat(savedZoom);
+            document.body.style.zoom = zoomValue;
+        }
+    });
+
+    // Lista de fontes para alternar
+    const fonts = ["Rubik", "Arial", "Verdana", "Georgia", "Courier New", "Times New Roman"];
+    let fontIndex = 0;
+
+    // Função para alternar a fonte
+    function changeFont() {
+        fontIndex = (fontIndex + 1) % fonts.length;
+        document.body.style.fontFamily = fonts[fontIndex];
+        localStorage.setItem("selectedFont", fonts[fontIndex]);
+    }
+
+    // Evento de clique para o botão de troca de fonte
+    document.getElementById("change-font").addEventListener("click", changeFont);
+
+    // Aplica a fonte salva ao carregar a página
+    window.addEventListener("load", () => {
+        const savedFont = localStorage.getItem("selectedFont");
+        if (savedFont) {
+            document.body.style.fontFamily = savedFont;
+            fontIndex = fonts.indexOf(savedFont);
+        }
+    });
+
+    // Função para alternar entre os temas claro e escuro
+   // Alterna entre temas claro e escuro e armazena a escolha do usuário
+function toggleTheme() {
+    if (document.body.classList.contains("dark-theme")) {
+        document.body.classList.replace("dark-theme", "light-theme");
+        localStorage.setItem("theme", "light");
+    } else {
+        document.body.classList.replace("light-theme", "dark-theme");
+        localStorage.setItem("theme", "dark");
+    }
+}
+
+// Atribui o evento de clique ao botão de troca de tema
+document.getElementById("toggle-theme").addEventListener("click", toggleTheme);
+
+// Aplica o tema salvo ao carregar a página
+window.addEventListener("load", () => {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.body.classList.add(savedTheme + "-theme");
+});
+
+</script>

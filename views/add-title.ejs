@@ -1,0 +1,60 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<div class="bookadd-container">
+  <div class="bookadd-card">
+    <h2 class="bookadd-title">📝 Adicionar Resenha</h2>
+
+    <% if(titleAdded) { %>
+      <script>toastr.success(`Título adicionado com sucesso!`)</script>
+    <% } %>
+
+    <form action="/books/titles/add" method="POST" enctype="multipart/form-data" class="bookadd-form">
+
+      <div class="bookadd-grid">
+        <!-- Nome do título -->
+        <div class="bookadd-field">
+          <label for="name">Nome do Título</label>
+          <div class="bookadd-input-wrapper">
+            <i class="fas fa-heading"></i>
+            <input type="text" id="name" name="name" placeholder="Nome do título" value="<%= req.body ? req.body.name : '' %>" required>
+          </div>
+          <% let nameError = validationErrors.find(err => err.param === 'name') %>
+          <% if (nameError) { %>
+            <script>toastr.error(`<%= nameError.msg %>`)</script>
+          <% } %>
+        </div>
+
+        <!-- Autor -->
+        <div class="bookadd-field">
+          <label for="author">Autor</label>
+          <div class="bookadd-input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" id="author" name="author" placeholder="Autor" value="<%= req.body ? req.body.author : '' %>">
+          </div>
+        </div>
+
+        <!-- Imagem -->
+        <div class="bookadd-field">
+          <label for="image">Imagem do Título</label>
+          <input type="file" id="image" name="image">
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="bookadd-field">
+        <label for="description">Descrição</label>
+        <div class="bookadd-input-wrapper">
+          <i class="fas fa-file"></i>
+          <textarea id="description" name="description" placeholder="Digite uma descrição"><%= req.body ? req.body.description : '' %></textarea>
+        </div>
+      </div>
+
+      <div class="bookadd-submit">
+        <button type="submit">Adicionar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% include footer.ejs %>

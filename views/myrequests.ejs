@@ -1,0 +1,137 @@
+<% include header.ejs %>
+<% include font-control.ejs %>
+
+<link rel="stylesheet" href="/css/solicitacoes.css">
+
+<div class="solicitacoes-main">
+  <h2 class="solicitacoes-titulo">Solicitações enviadas</h2>
+
+  <% if (totalPages.length > 0) { %>
+    <div class="solicitacoes-paginacao">
+      <p>Página:</p>
+      <ul>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="<%= currentPage == i ? 'active' : '' %>">
+            <a href="/trades/myrequests?page=<%= i %>">
+              <%= i %>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  <% } %>
+
+  <% if (trades.length === 0) { %>
+    <p class="solicitacoes-alerta">Você ainda não enviou nenhuma solicitação.</p>
+  <% } else { %>
+    <div class="solicitacoes-container">
+      <% trades.forEach(trade => { %>
+        <div class="solicitacoes-card">
+          <div class="solicitacoes-topo">
+            <img src="<%= trade.receiver.image %>" alt="Imagem do destinatário" class="solicitacoes-img" />
+            <a href="/user/<%= trade.receiver.id %>" class="trader-name">
+              <%= trade.receiver.name %>
+            </a>
+            <span class="solicitacoes-codigo">#<%= trade.id %></span>
+          </div>
+
+          <div class="solicitacoes-livros">
+            <div class="livro-item">
+              <a href="/books/<%= trade.booksender.id %>">
+                <img src="<%= trade.booksender.image %>" alt="Livro oferecido" class="livro-img">
+                <span>Você ofereceu: <%= trade.booksender.name %></span>
+              </a>
+            </div>
+            <div class="livro-item">
+              <a href="/books/<%= trade.bookreceiver.id %>">
+                <img src="<%= trade.bookreceiver.image %>" alt="Livro desejado" class="livro-img">
+                <span>Desejado: <%= trade.bookreceiver.name %></span>
+              </a>
+            </div>
+          </div>
+
+          <div class="solicitacoes-data">
+            <p><strong>Enviado:</strong>
+              <span class="data-relativa" data-date="<%= trade.createdAt %>"></span>
+            </p>
+          </div>
+
+          <div class="solicitacoes-acoes">
+            <button class="solicitacoes-btn-recusar" data-id="<%= trade.id %>">Cancelar</button>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+</div>
+
+<% include footer.ejs %>
+
+<!-- Modal: Cancelar Solicitação -->
+<div class="modal" id="modal-cancel">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModalCancel">&times;</span>
+    <h2 style="color:white;">Cancelar esta solicitação?</h2>
+    <div class="modal-buttons">
+      <form id="cancelTrade" class="modal-form-buttons" method="POST">
+        <button type="submit" class="btn-confirm">Sim</button>
+      </form>
+      <div>
+        <button type="button" class="btn-cancel" id="cancelCancelBtn">Não</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function formatTimeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return `${seconds} segundo(s) atrás`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minuto(s) atrás`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hora(s) atrás`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days} dia(s) atrás`;
+
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.data-relativa').forEach(el => {
+      const date = el.getAttribute('data-date');
+      el.textContent = formatTimeAgo(date);
+    });
+  });
+
+  document.querySelectorAll('.solicitacoes-btn-recusar').forEach(button => {
+    button.addEventListener('click', function () {
+      document.getElementById('modal-cancel').style.display = 'block';
+      document.getElementById('cancelTrade').action = '/trade/cancel-request/' + this.dataset.id;
+    });
+  });
+
+  document.getElementById('closeModalCancel').addEventListener('click', () => {
+    document.getElementById('modal-cancel').style.display = 'none';
+  });
+
+  document.getElementById('cancelCancelBtn').addEventListener('click', () => {
+    document.getElementById('modal-cancel').style.display = 'none';
+  });
+
+  window.addEventListener('click', function (event) {
+    const modal = document.getElementById('modal-cancel');
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+</script>
